@@ -19,5 +19,14 @@ public class OutputDataStructure {
 	private HashMap<String, Integer> metaData;
 	
 	
+	public String linksToString() {
+		return "";
+	}
+	public String ngramToString() {
+		return "";
+	}
+	public String toString() {
+		return "";
+	}
 
 }
