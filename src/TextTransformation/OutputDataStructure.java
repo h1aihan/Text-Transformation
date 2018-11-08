@@ -10,7 +10,7 @@ import org.json.*;
 public class OutputDataStructure {
 	// TODO: Document member variable
 	// TODO: Create public accessors
-	private HashMap<String, Int> wordGram;
+	private HashMap<String, NGram> wordGrams;
 	// TODO: Document member variable
 	// Gram type
 	// 	1 - Word
