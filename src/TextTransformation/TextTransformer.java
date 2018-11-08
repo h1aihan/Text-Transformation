@@ -6,8 +6,6 @@ public class TextTransformer {
 	// TODO: Document member variable
 	private OutputDataStructure output;
 	// TODO: Document member variable
-	private NetworkHandler handler;
-	// TODO: Document member variable
 	private HtmlParser parser;
 	
 	// TODO: Document function
