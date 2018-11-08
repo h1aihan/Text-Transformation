@@ -6,7 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/adamthk/Google Drive/Downloads/java-json.jar">
+	<classpathentry kind="lib" path="/Users/adamthk/Documents/GitHub/Text-Transformation/src/java-json.jar" sourcepath="">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
