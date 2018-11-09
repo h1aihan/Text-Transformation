@@ -3,7 +3,6 @@ import java.lang.Math;
 import java.lang.String;
 import java.util.*;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 
@@ -38,10 +37,16 @@ public class HtmlParser {
 		// Check for certain allowed punctuation
 		//		-> only single quotation mark is allowed
 		int occurrences = 0;
+		String tmp[];
 		for (int i = 0; i < words.size(); i++) {
 			occurrences = StringUtils.countMatches(words.get(i), '\'');
 			if (occurrences > 1) {
 				// Split the word
+				tmp = words.get(i).split('\'');
+				words.set(i, tmp[0] + tmp[1]);
+				for (int j = 2; j < tmp.length; j++) {
+					words.add(i+j-1, tmp[j]);
+				}
 			}
 		}
 	}
