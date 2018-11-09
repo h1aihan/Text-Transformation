@@ -14,12 +14,6 @@ public class HtmlParser {
 	public List<Url> parserUrl(String html){
 		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
 		    List<Url> found = parser.detect();
-
-		    for(Url url : found) {
-		        System.out.println("Scheme: " + url.getScheme());
-		        System.out.println("Host: " + url.getHost());
-		        System.out.println("Path: " + url.getPath());
-		    }
 		    return found; 
 	}
 	
