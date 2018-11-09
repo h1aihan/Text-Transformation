@@ -6,10 +6,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/adamthk/Documents/GitHub/Text-Transformation/src/java-json.jar" sourcepath="">
+	<classpathentry kind="lib" path="/Users/evajiang/Text-Transformation/java-json.jar" sourcepath="">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/evajiang/Text-Transformation/commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

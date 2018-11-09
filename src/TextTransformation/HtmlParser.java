@@ -2,8 +2,9 @@ package TextTransformation;
 import java.lang.Math;
 import java.lang.String;
 import java.util.*;
-import org.json.*;
 
+import org.apache.commons.lang3.StringUtils;
+import org.json.*;
 
 // TODO: Consider making static
 //TODO: Document class definition
@@ -31,6 +32,13 @@ public class HtmlParser {
 		
 		// Check for certain allowed punctuation
 		//		-> only single quotation mark is allowed
+		int occurrences = 0;
+		for (int i = 0; i < words.size(); i++) {
+			occurrences = StringUtils.countMatches(words.get(i), '\'');
+			if (occurrences > 1) {
+				// Split the word
+			}
+		}
 	}
 	
 	// Edge cases - tags where we don't want the in between stuff.
@@ -69,7 +77,7 @@ public class HtmlParser {
 					}
 				}
 			}
-	
+
 			open = buffer.indexOf("<", open);
 			close = buffer.indexOf(">", open);
 		}
@@ -97,8 +105,19 @@ public class HtmlParser {
 		return tag.substring(start, end);
 	}
 	
+	public boolean isTag(String word) {
+		return word.startsWith("<") && word.endsWith(">");
+	}
+	
 	public OutputDataStructure parse(JSONObject json) throws Exception {
 		// TODO: Implement
+		
+		// Parse html
+		String html = json.getString("content");
+		parse(html);
+		
+		// Create the ngrams
+		
 		throw new Exception();
 	}
 	
