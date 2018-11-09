@@ -11,5 +11,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/h1aih/Downloads/url-detector-0.1.17.jar"/>
+	<classpathentry kind="lib" path="C:/javalibary/commons-lang3-3.8.1/commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
