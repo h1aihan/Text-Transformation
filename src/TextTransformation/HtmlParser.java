@@ -2,9 +2,13 @@ package TextTransformation;
 import java.lang.Math;
 import java.lang.String;
 import java.util.*;
-
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
+
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
+import com.linkedin.urls.detection.UrlDetectorOptions;
 
 // TODO: Consider making static
 //TODO: Document class definition
@@ -107,6 +111,12 @@ public class HtmlParser {
 	
 	public boolean isTag(String word) {
 		return word.startsWith("<") && word.endsWith(">");
+	}		
+
+	public List<Url> parserUrl(String html){
+		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
+		    List<Url> found = parser.detect();
+		    return found;
 	}
 	
 	public OutputDataStructure parse(JSONObject json) throws Exception {

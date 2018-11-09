@@ -77,11 +77,11 @@ public class SimpleHttpServer {
 		
 		// Send the string "s" to the String URL "to"
 		private void send(String s, String to) throws Exception {
-			HttpURLConnection c = ForwardHandler.makeConnection(to);
+			HttpURLConnection c = ForwardHandler.makeConnection(to);;
 			// TODO: Configure c
 			c.setDoOutput(true);
 			DataOutputStream out = new DataOutputStream(c.getOutputStream());
-			out.writeBytes(s);
+			out.write(s.getBytes());
 			out.flush();
 			out.close();
 		}
@@ -90,26 +90,33 @@ public class SimpleHttpServer {
 //			Headers h = e.getResponseHeaders();
 			JSONObject obj = new JSONObject(e.getRequestBody());
 			String response = Constants.StaticText.NetworkDefaultError;
-			
+			JSONObject jsonResponse = new JSONObject();
 			try {
 				OutputDataStructure out = NetworkHandler.parser.parse(obj);
+				jsonResponse.put(Constants.JSON.metaDataKey, out.getMetaDataJSON());	
 				if (obj.has(Constants.JSON.linkForwardAddressKey)) {
 					String linkAddress = obj.getString(Constants.JSON.linkForwardAddressKey);
-					send(out.linksToString(), linkAddress);
+					jsonResponse.put(Constants.JSON.linksKey, out.getLinksJSON());
+					send(jsonResponse.toString(), linkAddress);
 				}
 				if (obj.has(Constants.JSON.indexingForwardAddressKey)) {
 					String indexAddress = obj.getString(Constants.JSON.indexingForwardAddressKey);
-					send(out.linksToString(), indexAddress);
+					if (jsonResponse.has(Constants.JSON.linksKey)) 
+						jsonResponse.remove(Constants.JSON.linksKey);
+					jsonResponse.put(Constants.JSON.indexingForwardAddressKey, out.getNGramJSON());
+					send(jsonResponse.toString(), indexAddress);
 				}
 				e.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
+				return;
 			} catch (Exception err) {
 				response = Constants.StaticText.NetworkDefaultError + ":\n\t" + err.getStackTrace().toString();
 				e.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, response.length());
+				OutputStream os = e.getResponseBody();
+				os.write(response.getBytes());
+				os.close();
 			}
 
-			OutputStream os = e.getResponseBody();
-			os.write(response.getBytes());
-			os.close();
+			
 		}
 	}
 }

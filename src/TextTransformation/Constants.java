@@ -8,6 +8,8 @@ public final class Constants {
 		public static final String linkForwardAddressKey = "linkAnalysis";
 		public static final String indexingForwardAddressKey = "indexing";
 		public static final String metaDataKey = "meta";
+		public static final String linksKey = "links";
+		public static final String ngramsKey = "ngrams";
 		
 	}
 	public static class Networking {

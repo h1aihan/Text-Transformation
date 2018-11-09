@@ -36,4 +36,7 @@ public class NgramMap {
 	public Boolean remove(ArrayList<String> words) {
 		return ngrams.remove(String.join(" ", words)) != null;
 	}
+	public HashMap<String, Integer> getMap() {
+		return new HashMap<String, Integer>(ngrams);
+	}
 }

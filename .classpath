@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
@@ -14,3 +15,22 @@
 	<classpathentry kind="lib" path="/Users/evajiang/Text-Transformation/commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/adamthk/Documents/GitHub/Text-Transformation/src/java-json.jar" sourcepath="">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/h1aih/Downloads/url-detector-0.1.17.jar"/>
+	<classpathentry kind="lib" path="C:/javalibary/commons-lang3-3.8.1/commons-lang3-3.8.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
+>>>>>>> 4845858a4c3b1b13a6348e4bc95f10c3a8e6f8b6
