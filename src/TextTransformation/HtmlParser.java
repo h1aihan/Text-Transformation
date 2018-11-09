@@ -2,7 +2,10 @@ package TextTransformation;
 import java.lang.Math;
 import java.lang.String;
 import java.util.*;
+import org.json.*;
 
+
+// TODO: Consider making static
 //TODO: Document class definition
 public class HtmlParser {
 	// Comment.
@@ -92,6 +95,11 @@ public class HtmlParser {
 			end = Math.min(end, tag.indexOf("/"));
 		}
 		return tag.substring(start, end);
+	}
+	
+	public OutputDataStructure parse(JSONObject json) throws Exception {
+		// TODO: Implement
+		throw new Exception();
 	}
 	
 }
