@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NgramMap {
-	private HashMap<String, Ngram> ngrams;
+	private HashMap<String, Integer> ngrams;
 	
 	public NgramMap() {
-		ngrams = new HashMap<String, Ngram>();
+		ngrams = new HashMap<String, Integer>();
 	}
 	
 	public Boolean contain(String gram) {
@@ -19,14 +19,14 @@ public class NgramMap {
 	}
 
 	public void insert(String gram) {
-		if (ngrams.containsKey(gram)) ngrams.get(gram).increment();
-		else ngrams.put(gram, new Ngram(gram));
+		if (ngrams.containsKey(gram)) ngrams.put(gram, ngrams.get(gram) + 1);
+		else ngrams.put(gram, 1);
 	}
 	
 	public void insert(ArrayList<String> words) {
 		String ngram = String.join(" ", words);
-		if (ngrams.containsKey(ngram)) ngrams.get(ngram).increment();
-		else ngrams.put(ngram, new Ngram(words));
+		if (ngrams.containsKey(ngram)) ngrams.put(ngram, ngrams.get(ngram) + 1);
+		else ngrams.put(ngram, 1);
 	}
 	
 	public Boolean remove(String gram) {
