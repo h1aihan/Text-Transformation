@@ -20,12 +20,11 @@ import com.sun.net.httpserver.HttpExchange;
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
 // See https://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html 
 public class SimpleHttpServer {
-	
+	static private HtmlParser parser = new HtmlParser();
 	// Creates process, starts running it
 	public static void main(String[] args) throws Exception {
 		HttpServer server = HttpServer.create(Constants.Networking.socketAddress, 0);
 		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
-		server.createContext(Constants.Networking.transformAndReturn, new NetworkHandler());
 		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
 		server.setExecutor(null); // creates a default executor
 		server.start();
@@ -36,30 +35,6 @@ public class SimpleHttpServer {
 		public void handle(HttpExchange e) throws IOException {
 			String response = Constants.StaticText.NetworkWelcomeMessage;
 			e.sendResponseHeaders(200, response.length());
-			OutputStream os = e.getResponseBody();
-			os.write(response.getBytes());
-			os.close();
-		}
-	}
-	
-	// Handles GET Requests (return transformed text JSON)
-	static class NetworkHandler implements HttpHandler {
-		static private HtmlParser parser = new HtmlParser();
-		public void handle(HttpExchange e) throws IOException {
-
-//			Headers h = e.getResponseHeaders();
-			JSONObject obj = new JSONObject(e.getRequestBody());
-			String response = Constants.StaticText.NetworkDefaultError;
-			
-			try {
-				OutputDataStructure out = NetworkHandler.parser.parse(obj);
-				response = (String)out.toString();
-				e.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
-			} catch (Exception err) {
-				response = err.getStackTrace().toString();
-				e.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, response.length());
-			}
-
 			OutputStream os = e.getResponseBody();
 			os.write(response.getBytes());
 			os.close();
@@ -77,8 +52,7 @@ public class SimpleHttpServer {
 		
 		// Send the string "s" to the String URL "to"
 		private void send(String s, String to) throws Exception {
-			HttpURLConnection c = ForwardHandler.makeConnection(to);;
-			// TODO: Configure c
+			HttpURLConnection c = ForwardHandler.makeConnection(to);
 			c.setDoOutput(true);
 			DataOutputStream out = new DataOutputStream(c.getOutputStream());
 			out.write(s.getBytes());
@@ -88,33 +62,48 @@ public class SimpleHttpServer {
 		
 		public void handle(HttpExchange e) throws IOException {
 //			Headers h = e.getResponseHeaders();
-			JSONObject obj = new JSONObject(e.getRequestBody());
-			String response = Constants.StaticText.NetworkDefaultError;
+			JSONObject jsonRequest = new JSONObject(e.getRequestBody());
 			JSONObject jsonResponse = new JSONObject();
+			int httpStatus = HttpURLConnection.HTTP_OK;
+			OutputDataStructure out;
+			
 			try {
-				OutputDataStructure out = NetworkHandler.parser.parse(obj);
-				jsonResponse.put(Constants.JSON.metaDataKey, out.getMetaDataJSON());	
-				if (obj.has(Constants.JSON.linkForwardAddressKey)) {
-					String linkAddress = obj.getString(Constants.JSON.linkForwardAddressKey);
+				out = .parse(jsonRequest);
+				jsonResponse.put(Constants.JSON.metaDataKey, out.getMetaDataJSON());
+			} catch (Exception err) {
+				// Unrecoverable error-- cannot parse!
+				httpStatus = HttpURLConnection.HTTP_INTERNAL_ERROR;
+				e.sendResponseHeaders(httpStatus, 0);
+				return;
+			}
+	
+			try {					
+				if (jsonRequest.has(Constants.JSON.linkForwardAddressKey)) {
+					String linkAddress = jsonRequest.getString(Constants.JSON.linkForwardAddressKey);
 					jsonResponse.put(Constants.JSON.linksKey, out.getLinksJSON());
 					send(jsonResponse.toString(), linkAddress);
 				}
-				if (obj.has(Constants.JSON.indexingForwardAddressKey)) {
-					String indexAddress = obj.getString(Constants.JSON.indexingForwardAddressKey);
+			} catch (Exception err) { 
+				// Recoverable error-- cannot send links
+				httpStatus = HttpURLConnection.HTTP_PARTIAL;
+			}
+			
+			try {
+				if (jsonRequest.has(Constants.JSON.indexingForwardAddressKey)) {
+					String indexAddress = jsonRequest.getString(Constants.JSON.indexingForwardAddressKey);
 					if (jsonResponse.has(Constants.JSON.linksKey)) 
 						jsonResponse.remove(Constants.JSON.linksKey);
+				
 					jsonResponse.put(Constants.JSON.indexingForwardAddressKey, out.getNGramJSON());
 					send(jsonResponse.toString(), indexAddress);
 				}
-				e.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
-				return;
-			} catch (Exception err) {
-				response = Constants.StaticText.NetworkDefaultError + ":\n\t" + err.getStackTrace().toString();
-				e.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, response.length());
-				OutputStream os = e.getResponseBody();
-				os.write(response.getBytes());
-				os.close();
+			} catch (Exception err) { 
+				// If two recoverable errors--> bad request!
+				httpStatus = httpStatus == HttpURLConnection.HTTP_PARTIAL ? 
+											HttpURLConnection.HTTP_BAD_REQUEST : 
+											HttpURLConnection.HTTP_PARTIAL;
 			}
+			e.sendResponseHeaders(httpStatus, 0);
 
 			
 		}
