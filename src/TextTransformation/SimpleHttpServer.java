@@ -68,7 +68,7 @@ public class SimpleHttpServer {
 			OutputDataStructure out;
 			
 			try {
-				out = .parse(jsonRequest);
+				out = (new HtmlParser()).parse(jsonRequest);
 				jsonResponse.put(Constants.JSON.metaDataKey, out.getMetaDataJSON());
 			} catch (Exception err) {
 				// Unrecoverable error-- cannot parse!

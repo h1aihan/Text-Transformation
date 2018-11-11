@@ -33,7 +33,7 @@ public class OutputDataStructure {
 	public JSONObject getNGramJSON() throws JSONException {
 		JSONObject ngramJSON = new JSONObject();
 		for (String key : wordGrams.keySet()) {
-			ngramJSON.put(key, wordGrams.get(key));
+			ngramJSON.put(key, wordGrams.get(key).getMap());
 		}
 		return ngramJSON;
 	}
