@@ -3,6 +3,7 @@ import java.lang.Math;
 import java.lang.String;
 import java.util.*;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 
@@ -12,11 +13,17 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 
 // TODO: Consider making static
 //TODO: Document class definition
-public class HtmlParser {
+public final class HtmlParser {
 	// Comment.
 	private static final String delimiters = "[ .,-\";?!/\\]+";
 	private static final String[] prioritizedTags = {"title", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""};
 	private ArrayList<String> words;
+	private HashMap<String, NgramMap> ngrams;
+	
+	HtmlParser() {
+		this.words = new ArrayList<String>();
+		this.ngrams = new HashMap<String, NgramMap>();
+	}
 	
 	// TODO: Implement
 	public void parse(String text) {
@@ -42,13 +49,17 @@ public class HtmlParser {
 			occurrences = StringUtils.countMatches(words.get(i), '\'');
 			if (occurrences > 1) {
 				// Split the word
-				tmp = words.get(i).split('\'');
+				tmp = words.get(i).split("\'");
 				words.set(i, tmp[0] + tmp[1]);
 				for (int j = 2; j < tmp.length; j++) {
 					words.add(i+j-1, tmp[j]);
 				}
 			}
 		}
+	}
+	
+	public void createNgrams() {
+		
 	}
 	
 	// Edge cases - tags where we don't want the in between stuff.
