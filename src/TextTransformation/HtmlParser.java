@@ -6,20 +6,20 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 
-import com.linkedin.urls.Url;
-import com.linkedin.urls.detection.UrlDetector;
-import com.linkedin.urls.detection.UrlDetectorOptions;
+//import com.linkedin.urls.Url;
+//import com.linkedin.urls.detection.UrlDetector;
+//import com.linkedin.urls.detection.UrlDetectorOptions;
 
 // TODO: Consider making static
 //TODO: Document class definition
-public final class HtmlParser {
+public class HtmlParser {
 	// Comment.
-	private static final String delimiters = "[ .,-\";?!/\\]+";
+	private static final String delimiters = "[ .!?,;-]+";
 	private static final String[] prioritizedTags = {"title", "p", "h1", "h2", "h3", "h4", "h5", "h6"};
 	private ArrayList<String> words;
 	private HashMap<String, NgramMap> ngrams;
 	
-	HtmlParser() {
+	public HtmlParser() {
 		this.words = new ArrayList<String>();
 		this.ngrams = new HashMap<String, NgramMap>();
 		ngrams.put("body", new NgramMap());
@@ -40,7 +40,6 @@ public final class HtmlParser {
 		
 		// Split string into words
 		this.words = new ArrayList<String>(Arrays.asList(text.split(delimiters)));
-		
 		// Remove if length < 2
 		words.removeIf(word -> word.length() < 2);
 		
@@ -53,7 +52,7 @@ public final class HtmlParser {
 			if (occurrences > 1) {
 				// Split the word
 				tmp = words.get(i).split("\'");
-				words.set(i, tmp[0] + tmp[1]);
+				words.set(i, tmp[0] + "'" + tmp[1]);
 				for (int j = 2; j < tmp.length; j++) {
 					words.add(i+j-1, tmp[j]);
 				}
@@ -64,6 +63,7 @@ public final class HtmlParser {
 	// Comment.
 	public void createNgrams() {
 		NgramMap m;
+//		ArrayList<String> tmp_words = new ArrayList<String>();
 		Stack<String> tags = new Stack<String>();
 		tags.add("body");
 		for (int i=0; i < words.size(); i++) {
@@ -80,6 +80,12 @@ public final class HtmlParser {
 				// Add word to the corresponding tag's ngram mapping 
 				m = ngrams.get(tags.peek());
 				m.insert(words.get(i));
+				
+				// 2grams -> 5grams
+//				tmp_words.add(words.get(i));
+//				for (int j = 2; j < 6; j++) {
+//					m.insert(tmp_words.subList(fromIndex, toIndex));
+//				}
 			}
 		}
 	}
@@ -106,22 +112,30 @@ public final class HtmlParser {
 			tag = buffer.substring(open, close+1);
 			if (!Arrays.asList(prioritizedTags).contains(getTagName(tag))) {
 				// Remove tag
-				buffer.replace(open, close, "");
+				buffer.replace(open, close+1, " ");
+				open = buffer.indexOf("<", open);
 			} else {
-				// Remove any modifiers/extraneous spacing on tag
-				// <tag mod=""> --> <tag>
+				// Remove any modifiers/extraneous spacing inside tag
+				// 		<tag mod=""> --> <tag>
+				// Also pad the tags with spaces to ensure that tags get separated from words
+				// 		"word<tag>word" -> "word <tag> word"
 				int mod = tag.indexOf(" ", open);
 				if (mod != -1) {
+					buffer.insert(close+1, " ");
 					if (tag.charAt(tag.length() - 2) == '/') {
 						buffer.replace(open + mod, close - 1, "");
 					}
 					else {
 						buffer.replace(open + mod, close, "");
 					}
+					buffer.insert(open, " ");
+					open = buffer.indexOf("<", open+mod);
+				} else {
+					buffer.insert(close+1, " ");
+					buffer.insert(open, " ");
+					open = buffer.indexOf("<", close);
 				}
 			}
-
-			open = buffer.indexOf("<", open);
 			close = buffer.indexOf(">", open);
 		}
 		return buffer.toString();
@@ -142,7 +156,7 @@ public final class HtmlParser {
 		if (tag.indexOf(" ") != -1) {
 			end = Math.min(end, tag.indexOf(" "));
 		}
-		if (tag.indexOf("/") != -1) {
+		if (tag.indexOf("/") != -1 && start != 2) {
 			end = Math.min(end, tag.indexOf("/"));
 		}
 		return tag.substring(start, end);
@@ -156,11 +170,11 @@ public final class HtmlParser {
 		return !word.startsWith("</");
 	}
 
-	public List<Url> parserUrl(String html){
-		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
-		    List<Url> found = parser.detect();
-		    return found;
-	}
+//	public List<Url> parserUrl(String html){
+//		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
+//		    List<Url> found = parser.detect();
+//		    return found;
+//	}
 	
 	public OutputDataStructure parse(JSONObject json) throws Exception {
 		// TODO: Implement

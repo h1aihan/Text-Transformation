@@ -6,13 +6,8 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/adamthk/Documents/GitHub/Text-Transformation/src/java-json.jar" sourcepath="">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/h1aih/Downloads/url-detector-0.1.17.jar"/>
-	<classpathentry kind="lib" path="C:/javalibary/commons-lang3-3.8.1/commons-lang3-3.8.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/h1aih/Downloads/junit-4.10.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="commons-lang3-3.8.1.jar"/>
+	<classpathentry kind="lib" path="java-json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
