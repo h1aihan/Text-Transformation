@@ -2,7 +2,6 @@ package TextTransformation;
 import java.lang.Math;
 import java.lang.String;
 import java.util.*;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
@@ -16,13 +15,17 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 public final class HtmlParser {
 	// Comment.
 	private static final String delimiters = "[ .,-\";?!/\\]+";
-	private static final String[] prioritizedTags = {"title", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""};
+	private static final String[] prioritizedTags = {"title", "p", "h1", "h2", "h3", "h4", "h5", "h6"};
 	private ArrayList<String> words;
 	private HashMap<String, NgramMap> ngrams;
 	
 	HtmlParser() {
 		this.words = new ArrayList<String>();
 		this.ngrams = new HashMap<String, NgramMap>();
+		ngrams.put("body", new NgramMap());
+		for (String t: prioritizedTags) {
+			ngrams.put(t, new NgramMap());
+		}
 	}
 	
 	// TODO: Implement
@@ -58,8 +61,27 @@ public final class HtmlParser {
 		}
 	}
 	
+	// Comment.
 	public void createNgrams() {
-		
+		NgramMap m;
+		Stack<String> tags = new Stack<String>();
+		tags.add("body");
+		for (int i=0; i < words.size(); i++) {
+			// Found a new tag
+			if (isTag(words.get(i))) {
+				// Add to stack
+				if (isOpeningTag(words.get(i))) {
+					tags.push(getTagName(words.get(i)));
+				} else {
+					// Pop from stack
+					tags.pop();
+				}
+			} else {
+				// Add word to the corresponding tag's ngram mapping 
+				m = ngrams.get(tags.peek());
+				m.insert(words.get(i));
+			}
+		}
 	}
 	
 	// Edge cases - tags where we don't want the in between stuff.
@@ -128,7 +150,11 @@ public final class HtmlParser {
 	
 	public boolean isTag(String word) {
 		return word.startsWith("<") && word.endsWith(">");
-	}		
+	}
+	
+	public boolean isOpeningTag(String word) {
+		return !word.startsWith("</");
+	}
 
 	public List<Url> parserUrl(String html){
 		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
@@ -144,6 +170,7 @@ public final class HtmlParser {
 		parse(html);
 		
 		// Create the ngrams
+		createNgrams();
 		
 		throw new Exception();
 	}
