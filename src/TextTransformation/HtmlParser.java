@@ -6,9 +6,9 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 
-//import com.linkedin.urls.Url;
-//import com.linkedin.urls.detection.UrlDetector;
-//import com.linkedin.urls.detection.UrlDetectorOptions;
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
+import com.linkedin.urls.detection.UrlDetectorOptions;
 
 // TODO: Consider making static
 //TODO: Document class definition
@@ -63,7 +63,7 @@ public class HtmlParser {
 	// Comment.
 	public void createNgrams() {
 		NgramMap m;
-//		ArrayList<String> tmp_words = new ArrayList<String>();
+		ArrayList<String> tmp_words = new ArrayList<String>();
 		Stack<String> tags = new Stack<String>();
 		tags.add("body");
 		for (int i=0; i < words.size(); i++) {
@@ -80,12 +80,18 @@ public class HtmlParser {
 				// Add word to the corresponding tag's ngram mapping 
 				m = ngrams.get(tags.peek());
 				m.insert(words.get(i));
-				
+
 				// 2grams -> 5grams
-//				tmp_words.add(words.get(i));
-//				for (int j = 2; j < 6; j++) {
-//					m.insert(tmp_words.subList(fromIndex, toIndex));
-//				}
+				tmp_words.add(words.get(i));
+				for (int j = 2; j < 6; j++) {
+					if (tmp_words.size() < j) {
+						break;
+					}
+					m.insert(new ArrayList<String>(tmp_words.subList(tmp_words.size()-j, tmp_words.size())));
+				}
+				if (tmp_words.size() == 5) {
+					tmp_words.remove(0);
+				}
 			}
 		}
 	}
