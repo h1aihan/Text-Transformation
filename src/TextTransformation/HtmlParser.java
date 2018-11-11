@@ -176,11 +176,11 @@ public class HtmlParser {
 		return !word.startsWith("</");
 	}
 
-//	public List<Url> parserUrl(String html){
-//		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
-//		    List<Url> found = parser.detect();
-//		    return found;
-//	}
+	public List<Url> parserUrl(String html){
+		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
+		    List<Url> found = parser.detect();
+		    return found;
+	}
 	
 	public OutputDataStructure parse(JSONObject json) throws Exception {
 		// TODO: Implement
