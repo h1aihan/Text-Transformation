@@ -38,8 +38,7 @@ public final class Constants {
 			HashSet<String> words = new HashSet<String>();
 			try {
 				BufferedReader input = new BufferedReader(new FileReader("src/TextTransformation/stopwords.txt"));
-				String line = input.readLine();
-				for (line = input.readLine(); line != null; line = input.readLine()) words.add(line);
+				for (String line = input.readLine(); line != null; line = input.readLine()) words.add(line);
 				input.close();
 			} catch (IOException e) {
 			}
