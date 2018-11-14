@@ -192,7 +192,7 @@ public class HtmlParser {
 		// Create the ngrams
 		createNgrams();
 		
-		throw new Exception();
+		return new OutputDataStructure(this.ngrams);
 	}
 	
 }
