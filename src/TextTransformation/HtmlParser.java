@@ -79,7 +79,10 @@ public class HtmlParser {
 			} else {
 				// Add word to the corresponding tag's ngram mapping 
 				m = ngrams.get(tags.peek());
-				m.insert(words.get(i));
+				Set<String> stopWords=Constants.StaticCollections.StopWords;
+				if (!stopWords.contains(words.get(i))) {
+					m.insert(words.get(i));
+				}
 
 				// 2grams -> 5grams
 				tmp_words.add(words.get(i));
