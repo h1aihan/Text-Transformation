@@ -9,5 +9,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="lib" path="java-json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/johnsk18/git/Text-Transformation/commons-lang3-3.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/johnsk18/git/Text-Transformation/url-detector-0.1.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
