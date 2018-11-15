@@ -19,6 +19,10 @@ public class OutputDataStructure {
 	private HashSet<String> links;
 	private HashMap<String, String> metaData;
 	
+	public OutputDataStructure(HashMap<String, NgramMap> ngrams) {
+		this.wordGrams = ngrams;
+	}
+	
 	public JSONObject getMetaDataJSON() throws JSONException  {
 		return new JSONObject(metaData);
 	}
