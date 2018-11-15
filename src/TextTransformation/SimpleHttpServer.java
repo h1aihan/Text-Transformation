@@ -19,15 +19,24 @@ import com.sun.net.httpserver.HttpExchange;
 // SimpleHttpServer creates a process to handle all requests
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
 // See https://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html 
-public class SimpleHttpServer {
+public class SimpleHttpServer  {
 	static private HtmlParser parser = new HtmlParser();
-	// Creates process, starts running it
-	public static void main(String[] args) throws Exception {
-		HttpServer server = HttpServer.create(Constants.Networking.socketAddress, 0);
+	private HttpServer server;
+	public void setupServer() throws Exception {
+		server = HttpServer.create(Constants.Networking.socketAddress, 0);
 		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
 		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
 		server.setExecutor(null); // creates a default executor
 		server.start();
+	}
+	public void stopServer() {
+		server.stop(0);
+	}
+	
+	// Creates process, starts running it
+	public static void main(String[] args){
+		
+		
 	}
 	
 	// Returns a nice little info page if you don't know what you're doing
