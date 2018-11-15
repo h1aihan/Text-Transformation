@@ -11,7 +11,6 @@ import java.io.DataOutputStream;
 import java.net.URL;
 import java.net.HttpURLConnection;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -34,9 +33,8 @@ public class SimpleHttpServer  {
 	}
 	
 	// Creates process, starts running it
-	public static void main(String[] args){
-		
-		
+	public static void main(String [ ] args) {
+		System.out.println("SimpleHttpServer Main Started");
 	}
 	
 	// Returns a nice little info page if you don't know what you're doing
