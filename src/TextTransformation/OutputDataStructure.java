@@ -1,8 +1,6 @@
 package TextTransformation;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-
 import org.json.*;
 
 
@@ -18,9 +16,12 @@ public class OutputDataStructure {
 	// 	3 - TriGram
 	//  ...
 	// TODO: Create public accessors
-	private int gramN;
 	private HashSet<String> links;
 	private HashMap<String, String> metaData;
+	
+	public OutputDataStructure(HashMap<String, NgramMap> ngrams) {
+		this.wordGrams = ngrams;
+	}
 	
 	public JSONObject getMetaDataJSON() throws JSONException  {
 		return new JSONObject(metaData);
