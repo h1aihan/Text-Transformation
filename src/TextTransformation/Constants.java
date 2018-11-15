@@ -30,7 +30,7 @@ public final class Constants {
 		public static String NetworkUnableToParseError = "The Parser was unable to parse the object";
 		public static String NetworkInavlidForwardAddressError = "Forwarding to a forward address failed";
 		public static String NetworkWelcomeMessage = "Hello! Welcome to the Indigo-O Text Transformer!\n"
-																+ "\tTry /transform to transform HTML\n";
+																+ "\tTry /transform to transform HTML";
 	}
 	
 	public static class StaticCollections {
