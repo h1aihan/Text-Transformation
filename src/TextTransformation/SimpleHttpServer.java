@@ -34,7 +34,16 @@ public class SimpleHttpServer  {
 	
 	// Creates process, starts running it
 	public static void main(String [ ] args) {
-		System.out.println("SimpleHttpServer Main Started");
+		System.out.println("SimpleHttpServer Main Driver");
+		SimpleHttpServer httpServer = new SimpleHttpServer();
+		try {
+			httpServer.setupServer();
+			System.out.println("Server started");
+			// TODO: Determine how to keep the java server alive
+		} catch (Exception e) {
+			System.out.println("Failed to start Java HTTP server-- calling it quits");
+			httpServer.stopServer();
+		}
 	}
 	
 	// Returns a nice little info page if you don't know what you're doing
