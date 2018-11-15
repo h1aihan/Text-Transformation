@@ -82,7 +82,7 @@ public class UnitTestNetworkHandler {
 		URLConnection c;
 		HttpURLConnection httpConnection;
 		try {
-			url = new URL("https://www.example.com/login");
+			url = new URL("http://127.0.0.1:" + Constants.Networking.socketAddress.getPort());
 			c = url.openConnection();
 			httpConnection = (HttpURLConnection)c;
 			httpConnection.setRequestMethod("POST"); // PUT is another valid option
