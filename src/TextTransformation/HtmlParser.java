@@ -179,23 +179,26 @@ public class HtmlParser {
 		return !word.startsWith("</");
 	}
 
-	public List<Url> parserUrl(String html){
+	public HashSet<String> parseUrl(String html){
 		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
+		 HashSet<String> links=new HashSet<String>();
 		    List<Url> found = parser.detect();
-		    return found;
+		    for(Url url : found) {
+				links.add(url.getFullUrl());
+			}
+		    return links;
 	}
-	
+
 	public OutputDataStructure parse(JSONObject json) throws Exception {
 		// TODO: Implement
 		
 		// Parse html
 		String html = json.getString("content");
 		parse(html);
-		
+		HashSet<String> links=this.parseUrl(html);
 		// Create the ngrams
 		createNgrams();
-		
-		return new OutputDataStructure(this.ngrams);
+		return new OutputDataStructure(this.ngrams,links);
 	}
 	
 }
