@@ -1,23 +1,20 @@
 package TextTransformation;
 
-// JSONObject
-import org.json.*;
-
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.DataOutputStream;
-
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import java.net.HttpURLConnection;
+// JSONObject
+import org.json.JSONObject;
 
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
 // SimpleHttpServer creates a process to handle all requests
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
