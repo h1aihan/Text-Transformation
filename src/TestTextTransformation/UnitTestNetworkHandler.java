@@ -23,19 +23,20 @@ import org.junit.Test;
 
 import org.apache.commons.lang3.StringUtils;
 import TextTransformation.Constants;
-import TextTransformation.SimpleHttpServer;
+import TextTransformation.SimpleHttpServlet;
 
 public class UnitTestNetworkHandler {
-	SimpleHttpServer server = new SimpleHttpServer();
+	SimpleHttpServlet server = new SimpleHttpServlet();
 	
 	@Before
 	public void setUp() throws Exception {
-		server.setupServer();
+		//server.setupServer();
+		fail("Need to refactor tests");
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		server.stopServer();
+		//server.stopServer();
 	}
 
 	

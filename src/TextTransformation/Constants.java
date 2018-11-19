@@ -31,6 +31,9 @@ public final class Constants {
 		public static String NetworkInavlidForwardAddressError = "Forwarding to a forward address failed";
 		public static String NetworkWelcomeMessage = "Hello! Welcome to the Indigo-O Text Transformer!\n"
 																+ "\tTry /transform to transform HTML";
+		public static String NetworkDefaultTitle = "transform text with indigo-O";
+		public static String NetworkWelcomeMessageHTML = "<HTML><HEAD><TITLE>" + Constants.StaticText.NetworkDefaultTitle + "</TITLE></HEAD>" +
+														 "<BODY>" + Constants.StaticText.NetworkWelcomeMessage + "</BODY></HTML>";
 	}
 	
 	public static class StaticCollections {

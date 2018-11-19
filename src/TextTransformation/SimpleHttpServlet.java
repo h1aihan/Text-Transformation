@@ -1,14 +1,18 @@
 package TextTransformation;
 
-
 // JSONObject
 import org.json.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.DataOutputStream;
 
 import java.net.URL;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+
 import java.net.HttpURLConnection;
 
 import com.sun.net.httpserver.HttpServer;
@@ -18,32 +22,44 @@ import com.sun.net.httpserver.HttpExchange;
 // SimpleHttpServer creates a process to handle all requests
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
 // See https://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html 
-public class SimpleHttpServer  {
+public class SimpleHttpServlet extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8021309171908246830L;
 	static private HtmlParser parser = new HtmlParser();
-	private HttpServer server;
-	public void setupServer() throws Exception {
-		server = HttpServer.create(Constants.Networking.socketAddress, 0);
-		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
-		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
-		server.setExecutor(null); // creates a default executor
-		server.start();
+//	private HttpServer server;
+//	public void setupServer() throws Exception {
+//		server = HttpServer.create(Constants.Networking.socketAddress, 0);
+//		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
+//		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
+//		server.setExecutor(null); // creates a default executor
+//		server.start();
+//	}
+//	public void stopServer() {
+//		server.stop(0);
+//	}
+	public void doGet(HttpServletRequest request, 
+			  HttpServletResponse response) 
+			  throws ServletException, IOException {
+			  
+			  PrintWriter out = response.getWriter();
+			  out.println(Constants.StaticText.NetworkWelcomeMessageHTML);
 	}
-	public void stopServer() {
-		server.stop(0);
-	}
+	
+	
 	
 	// Creates process, starts running it
 	public static void main(String [ ] args) {
-		System.out.println("SimpleHttpServer Main Driver");
-		SimpleHttpServer httpServer = new SimpleHttpServer();
-		try {
-			httpServer.setupServer();
-			System.out.println("Server started");
-			// TODO: Determine how to keep the java server alive
-		} catch (Exception e) {
-			System.out.println("Failed to start Java HTTP server-- calling it quits");
-			httpServer.stopServer();
-		}
+//		System.out.println("SimpleHttpServer Main Driver");
+//		SimpleHttpServlet httpServer = new SimpleHttpServlet();
+//		try {
+//			httpServer.setupServer();
+//			System.out.println("Server started");
+//			// TODO: Determine how to keep the java server alive
+//		} catch (Exception e) {
+//			System.out.println("Failed to start Java HTTP server-- calling it quits");
+//		}
 	}
 	
 	// Returns a nice little info page if you don't know what you're doing
@@ -92,7 +108,7 @@ public class SimpleHttpServer  {
 				e.sendResponseHeaders(httpStatus, 0);
 				return;
 			}
-	
+
 			try {					
 				if (jsonRequest.has(Constants.JSON.linkForwardAddressKey)) {
 					String linkAddress = jsonRequest.getString(Constants.JSON.linkForwardAddressKey);
