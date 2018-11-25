@@ -10,5 +10,11 @@
 	<classpathentry kind="lib" path="commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="lib" path="java-json.jar"/>
 	<classpathentry kind="lib" path="url-detector-0.1.17.jar"/>
+	<classpathentry kind="lib" path="javax.servlet-api-4.0.1.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/jasper.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/jsp-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/el-api.jar"/>
+	<classpathentry kind="var" path="TOMCAT_HOME/lib/annotations-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
