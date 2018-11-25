@@ -14,18 +14,25 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 //TODO: Document class definition
 public class HtmlParser {
 	// Comment.
-	private static final String delimiters = "[ .!?,;-]+";
-	private static final String[] prioritizedTags = {"title", "p", "h1", "h2", "h3", "h4", "h5", "h6"};
+	private static final String delimiters = "[ \".!?,;-]+";
+	private static final String[] prioritizedTags = {"title", "h1", "h2", "h3", "h4", "h5", "h6"};
 	private ArrayList<String> words;
 	private HashMap<String, NgramMap> ngrams;
 	
 	public HtmlParser() {
 		this.words = new ArrayList<String>();
 		this.ngrams = new HashMap<String, NgramMap>();
-		ngrams.put("body", new NgramMap());
-		for (String t: prioritizedTags) {
-			ngrams.put(t, new NgramMap());
-		}
+		ngrams.put("all", new NgramMap());
+		ngrams.put("headers", new NgramMap());
+		ngrams.put("title", new NgramMap());
+	}
+	
+	public ArrayList<String> getWords() {
+		return new ArrayList<String>(this.words);
+	}
+	
+	public HashMap<String, NgramMap> getNgrams() {
+		return new HashMap<String, NgramMap>(this.ngrams);
 	}
 	
 	// TODO: Implement
@@ -60,28 +67,55 @@ public class HtmlParser {
 		}
 	}
 	
+	public void increment(ArrayList<Integer> nums) {
+		for (int i=0; i<nums.size(); i++) {
+			nums.set(i, nums.get(i) + 1);
+		}
+	}
+	
 	// Comment.
 	public void createNgrams() {
 		NgramMap m;
 		ArrayList<String> tmp_words = new ArrayList<String>();
+		ArrayList<Integer> lengths = new ArrayList<Integer>();
+		lengths.add(0);
 		Stack<String> tags = new Stack<String>();
-		tags.add("body");
+		tags.add("all");
+		NgramMap all = ngrams.get("all");
+		boolean special = false;	// Special case -> ngram is title or header
+
 		for (int i=0; i < words.size(); i++) {
 			// Found a new tag
 			if (isTag(words.get(i))) {
 				// Add to stack
 				if (isOpeningTag(words.get(i))) {
 					tags.push(getTagName(words.get(i)));
+					lengths.add(0);
 				} else {
 					// Pop from stack
 					tags.pop();
+					lengths.remove(lengths.size() - 1);
 				}
 			} else {
-				// Add word to the corresponding tag's ngram mapping 
-				m = ngrams.get(tags.peek());
+				increment(lengths);
+				// Add word to the corresponding tag's ngram mapping
+				if (tags.peek().equals("title")) {
+					m = ngrams.get("title");
+					special = true;
+				} else if (Arrays.asList(prioritizedTags).contains(tags.peek())){
+					m = ngrams.get("headers");
+					special = true;
+				} else {
+					m = null;
+					special = false;
+				}
+				
 				Set<String> stopWords=Constants.StaticCollections.StopWords;
 				if (!stopWords.contains(words.get(i))) {
-					m.insert(words.get(i));
+					if (special) {
+						m.insert(words.get(i));
+					}
+					all.insert(words.get(i));
 				}
 
 				// 2grams -> 5grams
@@ -90,7 +124,10 @@ public class HtmlParser {
 					if (tmp_words.size() < j) {
 						break;
 					}
-					m.insert(new ArrayList<String>(tmp_words.subList(tmp_words.size()-j, tmp_words.size())));
+					if (special && lengths.get(lengths.size() - 1) >= j) {
+						m.insert(new ArrayList<String>(tmp_words.subList(tmp_words.size()-j, tmp_words.size())));
+					}
+					all.insert(new ArrayList<String>(tmp_words.subList(tmp_words.size()-j, tmp_words.size())));
 				}
 				if (tmp_words.size() == 5) {
 					tmp_words.remove(0);
@@ -105,7 +142,7 @@ public class HtmlParser {
 		int open = buffer.indexOf("<"+tagName, 0);
 		int close = buffer.indexOf("</" + tagName + ">", 0);
 		while (open != -1) {
-			buffer.replace(open, close, "");
+			buffer.replace(open, close + 3 + tagName.length(), "");
 			open = buffer.indexOf("<" + tagName, close);
 			close = buffer.indexOf("</" + tagName + ">", close);
 		}
@@ -193,7 +230,7 @@ public class HtmlParser {
 		// TODO: Implement
 		
 		// Parse html
-		String html = json.getString("content");
+		String html = json.getString("html");
 		parse(html);
 		HashSet<String> links=this.parseUrl(html);
 		// Create the ngrams
