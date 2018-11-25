@@ -67,12 +67,6 @@ public class HtmlParser {
 		}
 	}
 	
-	public void increment(ArrayList<Integer> nums) {
-		for (int i=0; i<nums.size(); i++) {
-			nums.set(i, nums.get(i) + 1);
-		}
-	}
-	
 	// Comment.
 	public void createNgrams() {
 		NgramMap m;
@@ -215,6 +209,12 @@ public class HtmlParser {
 	public boolean isOpeningTag(String word) {
 		return !word.startsWith("</");
 	}
+	
+	public void increment(ArrayList<Integer> nums) {
+		for (int i=0; i<nums.size(); i++) {
+			nums.set(i, nums.get(i) + 1);
+		}
+	}
 
 	public HashSet<String> parseUrl(String html){
 		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
@@ -227,8 +227,6 @@ public class HtmlParser {
 	}
 
 	public OutputDataStructure parse(JSONObject json) throws Exception {
-		// TODO: Implement
-		
 		// Parse html
 		String html = json.getString("html");
 		parse(html);
