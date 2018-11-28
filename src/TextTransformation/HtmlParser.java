@@ -10,8 +10,9 @@ import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.linkedin.urls.detection.UrlDetectorOptions;
 
-// TODO: Consider making static
-//TODO: Document class definition
+/**
+ * Text Transformation HtmlParser class.
+ */
 public class HtmlParser {
 	// Comment.
 	private static final String delimiters = "[ \".!?,;-]+";
@@ -19,6 +20,11 @@ public class HtmlParser {
 	private ArrayList<String> words;
 	private HashMap<String, NgramMap> ngrams;
 	
+	/**
+	 * Constructs an HtmlParser object.
+	 * 
+	 * @effects Initializes private member variables.
+	 */
 	public HtmlParser() {
 		this.words = new ArrayList<String>();
 		this.ngrams = new HashMap<String, NgramMap>();
@@ -27,15 +33,32 @@ public class HtmlParser {
 		ngrams.put("title", new NgramMap());
 	}
 	
+	/**
+	 * Returns a copy of the list of words found from parsing the last given text/html.
+	 * 
+	 * @return ArrayList<String>
+	 */
 	public ArrayList<String> getWords() {
 		return new ArrayList<String>(this.words);
 	}
 	
+	/**
+	 * Returns a copy of the hashmap of ngrams made.
+	 * 
+	 * @return HashMap<String, NgramMap>
+	 */
 	public HashMap<String, NgramMap> getNgrams() {
 		return new HashMap<String, NgramMap>(this.ngrams);
 	}
 	
-	// TODO: Implement
+	/**
+	 * Parses the given string:
+	 * 		changes all characters to lowercase,
+	 * 		removes unwanted tags,
+	 * 		and puts all valid words into a list.
+	 * 
+	 * @param String text : The text to parse
+	 */
 	public void parse(String text) {
 		// Convert to lower-case
 		text = text.toLowerCase();
@@ -67,7 +90,9 @@ public class HtmlParser {
 		}
 	}
 	
-	// Comment.
+	/**
+	 * Populates the ngram hashmap with 1-5grams using the parsed list of words.
+	 */
 	public void createNgrams() {
 		NgramMap m;
 		ArrayList<String> tmp_words = new ArrayList<String>();
@@ -104,6 +129,7 @@ public class HtmlParser {
 					special = false;
 				}
 				
+				// Ignore if stop word.
 				Set<String> stopWords=Constants.StaticCollections.StopWords;
 				if (!stopWords.contains(words.get(i))) {
 					if (special) {
@@ -130,7 +156,15 @@ public class HtmlParser {
 		}
 	}
 	
-	// Edge cases - tags where we don't want the in between stuff.
+	/**
+	 * Finds and removes the given tag and body from String 'text'.
+	 * Example: If tagName = "script" and text = "hello <script>abc</script>world"
+	 * 		The resulting string = "hello world"
+	 * 
+	 * @param String text
+	 * @param String tagName	The tag to remove
+	 * @return String
+	 */
 	public String removeTagAndBody(String text, String tagName) {
 		StringBuffer buffer = new StringBuffer(text);
 		int open = buffer.indexOf("<"+tagName, 0);
@@ -143,6 +177,12 @@ public class HtmlParser {
 		return buffer.toString();
 	}
 	
+	/**
+	 * Finds and removes all tags that are not pre-defined as a prioritized tag from the given string.
+	 * 
+	 * @param String text
+	 * @return String
+	 */
 	public String cleanupTags(String text) {
 		StringBuffer buffer = new StringBuffer(text);
 		int open = buffer.indexOf("<", 0);
@@ -181,7 +221,12 @@ public class HtmlParser {
 		return buffer.toString();
 	}
 	
-	// Expected input --> <tag> or <tag modifier="m"> or </tag> or <tag/>
+	/**
+	 * Returns the tag name. If not given a valid tag, returns an empty string literal.
+	 * 
+	 * @param String tag	The tag to remove. (Expected inputs: <tag>, </tag>, <tag/>, <tag attribute="a">)
+	 * @return String
+	 */
 	public String getTagName(String tag) {
 		int start, end;
 		if (tag.startsWith("</")) {
@@ -202,14 +247,31 @@ public class HtmlParser {
 		return tag.substring(start, end);
 	}
 	
+	/**
+	 * Returns true if the given word is a valid tag, else returns false.
+	 * 
+	 * @param String word
+	 * @return boolean
+	 */
 	public boolean isTag(String word) {
 		return word.startsWith("<") && word.endsWith(">");
 	}
 	
+	/**
+	 * Returns true if the given word is an opening tag, else returns false.
+	 * 
+	 * @param String word
+	 * @return boolean
+	 */
 	public boolean isOpeningTag(String word) {
 		return !word.startsWith("</");
 	}
 	
+	/**
+	 * Increments all numbers in the ArrayList by 1.
+	 * 
+	 * @param ArrayList<Integer> nums
+	 */
 	public void increment(ArrayList<Integer> nums) {
 		for (int i=0; i<nums.size(); i++) {
 			nums.set(i, nums.get(i) + 1);
@@ -226,6 +288,12 @@ public class HtmlParser {
 		    return links;
 	}
 
+	/**
+	 * Returns an OutputDataStructure with the parsed ngrams and links.
+	 * 
+	 * @param JSONObject json
+	 * @return OutputDataStructure
+	 */
 	public OutputDataStructure parse(JSONObject json) throws Exception {
 		// Parse html
 		String html = json.getString("html");
