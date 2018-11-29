@@ -14,9 +14,10 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
  * Text Transformation HtmlParser class.
  */
 public class HtmlParser {
-	// Comment.
+	// variables to help parsing.
 	private static final String delimiters = "[ \".!?,;-]+";
 	private static final String[] prioritizedTags = {"title", "h1", "h2", "h3", "h4", "h5", "h6"};
+	// words and ngram data representation
 	private ArrayList<String> words;
 	private HashMap<String, NgramMap> ngrams;
 	
@@ -277,7 +278,11 @@ public class HtmlParser {
 			nums.set(i, nums.get(i) + 1);
 		}
 	}
-
+	/**
+	 *  Parse a string of html, extract links
+	 * @param String html
+	 * @return a hash set of url links in the html
+	 */
 	public HashSet<String> parseUrl(String html){
 		 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
 		 HashSet<String> links=new HashSet<String>();

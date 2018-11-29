@@ -64,17 +64,17 @@ public class UnitTestHtmlParser {
 	}
 	
 	@Test
-	// TODO:Implement
-	// fix: null pointer exception
+	// test this output data structure 
 	public void testOutputDataStructure() throws Exception{
-		this.json.put("content",simpleHtmlString);
+		this.json.put("html",simpleHtmlString);
 		parser1.parse(json);
 	}
 
 	@Test
 	public void testUrlParser() {
-		//Implement
-		fail("No implementation");
+		//Test simple HtmlString
+		HashSet<String> links=parser1.parseUrl(simpleHtmlString);
+		System.out.println(links); 
 		return;
 	}
 	
