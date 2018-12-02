@@ -97,7 +97,7 @@ public class SimpleHttpServlet extends HttpServlet {
 			OutputDataStructure out;
 			
 			try {
-				out = (new HtmlParser()).parse(jsonRequest);
+				out = HtmlParser.Parser.parse(jsonRequest);
 				jsonResponse.put(Constants.JSON.metaDataKey, out.getMetaDataJSON());
 			} catch (Exception err) {
 				// Unrecoverable error-- cannot parse!

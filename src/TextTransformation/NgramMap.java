@@ -2,6 +2,9 @@ package TextTransformation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class NgramMap {
 	private HashMap<String, Integer> ngrams;
@@ -93,5 +96,28 @@ public class NgramMap {
 	 */
 	public HashMap<String, Integer> getMap() {
 		return new HashMap<String, Integer>(ngrams);
+	}
+	
+	/**
+	 * Returns a hash map that contains only ngrams of length n words.
+	 * 
+	 * @param n		The number of words the ngrams should consist of.
+	 * @return HashMap<String, Integer>
+	 */
+	public HashMap<String, Integer> getGramsN(int n) {
+		HashMap<String, Integer> subMap = new HashMap<String, Integer>();
+		Iterator<Entry<String, Integer>> it = ngrams.entrySet().iterator();
+		int spaces = 0;
+		// Iterate through key-value pairs in ngrams.
+	    while (it.hasNext()) {
+	        Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>)it.next();
+	        // Calculate how many spaces are in the ngram
+	        // A gram with x spaces would mean that the gram contains x+1 words 
+	        spaces = pair.getKey().length() - pair.getKey().replaceAll(" ", "").length();
+	        if (spaces == n - 1) {
+	        	subMap.put(pair.getKey(), pair.getValue());
+	        }
+	    }
+		return subMap;
 	}
 }

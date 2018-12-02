@@ -52,28 +52,17 @@ public class UnitTestHtmlParser {
 			"  </body>\r\n" + 
 			"</html>";
 	
-	@Before
-	public void setUp() {
-		parser1 = new HtmlParser();
-	}
-	
-	public void testConstructor() {
-		//Implement
-		fail("No implementation");
-		return;
-	}
-	
 	@Test
 	// test this output data structure 
 	public void testOutputDataStructure() throws Exception{
 		this.json.put("html",simpleHtmlString);
-		parser1.parse(json);
+		HtmlParser.Parser.parse(json);
 	}
 
 	@Test
 	public void testUrlParser() {
 		//Test simple HtmlString
-		HashSet<String> links=parser1.parseUrl(simpleHtmlString);
+		HashSet<String> links=HtmlParser.Parser.parseUrl(simpleHtmlString);
 		System.out.println(links); 
 		return;
 	}
@@ -82,7 +71,7 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testRemoveTagAndBody() {
 		String text = "<script> hello </script>";
-		String result = parser1.removeTagAndBody(text, "script");
+		String result = HtmlParser.Parser.removeTagAndBody(text, "script");
 		assertEquals(result, "");
 	}
 	
@@ -90,28 +79,28 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testCleanupTags() {
 		String html = "<body><b>Hello<p>World!</p></body>";
-		String result = parser1.cleanupTags(html);
+		String result = HtmlParser.Parser.cleanupTags(html);
 		assertEquals(result, "  Hello World!  ");
 	}
 	
 	@Test
 	public void testIsTag() {
 		String tag = "<p>";
-		assert(parser1.isTag(tag));
+		assert(HtmlParser.Parser.isTag(tag));
 	}
 	
 	@Test
 	public void testNotTag() {
 		String notTag = "not";
-		assertFalse(parser1.isTag(notTag));
+		assertFalse(HtmlParser.Parser.isTag(notTag));
 	}
 	
 	@Test
 	public void testIsOpeningTag() {
 		String openingTag = "<body>";
 		String closingTag = "</body>";
-		assertTrue(parser1.isOpeningTag(openingTag));
-		assertFalse(parser1.isOpeningTag(closingTag));
+		assertTrue(HtmlParser.Parser.isOpeningTag(openingTag));
+		assertFalse(HtmlParser.Parser.isOpeningTag(closingTag));
 	}
 	
 	@Test
@@ -121,10 +110,10 @@ public class UnitTestHtmlParser {
 		String tag3 = "<img/>";
 		String tag4 = "<a href=blah >";
 		
-		String result1 = parser1.getTagName(tag1);
-		String result2 = parser1.getTagName(tag2);
-		String result3 = parser1.getTagName(tag3);
-		String result4 = parser1.getTagName(tag4);
+		String result1 = HtmlParser.Parser.getTagName(tag1);
+		String result2 = HtmlParser.Parser.getTagName(tag2);
+		String result3 = HtmlParser.Parser.getTagName(tag3);
+		String result4 = HtmlParser.Parser.getTagName(tag4);
 		
 		assertEquals(result1, "p");
 		assertEquals(result2, "p");
@@ -135,8 +124,7 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testParseSimpleText() {
 		String text = "abc";
-		parser1.parse(text);
-		ArrayList<String> result = parser1.getWords();
+		ArrayList<String> result = HtmlParser.Parser.parse(text);
 		assert(result.size() == 1);
 		assert(result.contains("abc"));
 	}
@@ -144,8 +132,7 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testParseSimpleHtml() {
 		String html = "<body><p>hello world</p></body>";
-		parser1.parse(html);
-		ArrayList<String> result = parser1.getWords();
+		ArrayList<String> result = HtmlParser.Parser.parse(html);;
 		assert(result.size() == 2);
 		assert(result.contains("hello"));
 		assert(result.contains("world"));
@@ -154,10 +141,9 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testGetNgramsSimpleText() {
 		String text = "one two three";
-		parser1.parse(text);
-		parser1.createNgrams();
+		ArrayList<String> parsed = HtmlParser.Parser.parse(text);
 		
-		HashMap<String, NgramMap> ngrams = parser1.getNgrams();
+		HashMap<String, NgramMap> ngrams = HtmlParser.Parser.createNgrams(parsed);
 		NgramMap allNgrams = ngrams.get("all");
 		
 		String[] expectedResults = {"one", "two", "three", "one two", "two three", "one two three"};
@@ -169,10 +155,9 @@ public class UnitTestHtmlParser {
 	@Test
 	public void testGetNgramsWithTitleAndHeader() {
 		String text = "one <title>two</title> three";
-		parser1.parse(text);
-		parser1.createNgrams();
+		ArrayList<String> parsed = HtmlParser.Parser.parse(text);
 		
-		HashMap<String, NgramMap> ngrams = parser1.getNgrams();
+		HashMap<String, NgramMap> ngrams = HtmlParser.Parser.createNgrams(parsed);
 		NgramMap titleNgrams = ngrams.get("title");
 		assert(titleNgrams.contain("two"));
 		assertFalse(titleNgrams.contain("one two"));
