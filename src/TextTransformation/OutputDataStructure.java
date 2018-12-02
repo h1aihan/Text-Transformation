@@ -35,7 +35,11 @@ public class OutputDataStructure {
 	public JSONObject getNGramJSON() throws JSONException {
 		JSONObject ngramJSON = new JSONObject();
 		for (String key : wordGrams.keySet()) {
-			ngramJSON.put(key, wordGrams.get(key).getMap());
+			JSONObject ngramGroup = new JSONObject();
+			for (int n=1; n <= 5; n++) {
+				ngramGroup.put(n+"grams", wordGrams.get(key).getGramsN(n));
+			}
+			ngramJSON.put(key, ngramGroup);
 		}
 		return ngramJSON;
 	}

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,12 @@ public final class Constants {
 		public static String NetworkDefaultTitle = "transform text with indigo-O";
 		public static String NetworkWelcomeMessageHTML = "<HTML><HEAD><TITLE>" + Constants.StaticText.NetworkDefaultTitle + "</TITLE></HEAD>" +
 														 "<BODY>" + Constants.StaticText.NetworkWelcomeMessage + "</BODY></HTML>";
+	}
+	
+	public static class Parsing {
+		public static final String delimiters = "[\\s\\\".!?,;-]+";
+		private static final String[] tagValues = {"title", "h1", "h2", "h3", "h4", "h5", "h6"};
+		public static final Set<String> prioritizedTags = new HashSet<>(Arrays.asList(tagValues)); 
 	}
 	
 	public static class StaticCollections {
