@@ -30,7 +30,7 @@ public class UnitTestHtmlParser {
 	private HtmlParser parser1;
 	private JSONObject json= new JSONObject(); 
 	private String simpleUrlSegment="hello this is a url Linkedin.com";
-	private String simpleHtmlString="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\r\n" + 
+	public static String simpleHtmlString="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\r\n" + 
 			" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\r\n" + 
 			"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\r\n" + 
 			"  <head>\r\n" + 

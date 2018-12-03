@@ -18,6 +18,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+
 // SimpleHttpServer creates a process to handle all requests
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
 // See https://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html 
@@ -41,7 +42,7 @@ public class SimpleHttpServer {
 		/* Sets root address handler, i.e. the object responsible for
 		 * connections made to the server 								
 		 * Currently, rootAddress -> InfoHandler */
-		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
+		server.createContext(Constants.Networking.infoAddress, new InfoHandler());
 		/* 			  transformAndForward -> ForwardHandler*/
 		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
 		/* Default executor (requests handled sequentially, until further development) */
@@ -113,7 +114,8 @@ public class SimpleHttpServer {
 		public void handle(HttpExchange e) throws IOException {
 			String requestMethod = e.getRequestMethod();
 			/* ForwardHandler only handles POSTs; redirect to Info page*/
-			if (!requestMethod.equals("POST") && requestMethod.equals("GET")) {
+			if (!requestMethod.equals("POST") && !requestMethod.equals("GET")) {
+				System.out.println("Non-Post or Get made on Transform endpoint");
 				new InfoHandler().handle(e);
 				return;
 			}
@@ -121,18 +123,22 @@ public class SimpleHttpServer {
 			JSONObject request;
 			JSONObject forward = new JSONObject();
 			int status = HttpURLConnection.HTTP_BAD_REQUEST;
+			
 			boolean isForwardingToIndexing;
 			boolean isForwardingLinks;
 			Output output;
 			
 			/* Determine if the request is valid */
 			try {
-				request = new JSONObject(e.getRequestHeaders());
 				
+				request = new JSONObject();
+				request.put("html", e.getRequestHeaders().getFirst("html"));
+				System.out.println(request.toString());
 				isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
 				isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
 				if (!isForwardingToIndexing && !isForwardingLinks && !requestMethod.equals("GET")) 
 					throw new Exception("ERROR: POST request must include at least one forwarding address.");
+				
 			} catch (Exception err) {
 				/* Unrecoverable error-- invalid request! */
 				status = HttpURLConnection.HTTP_BAD_REQUEST;
@@ -146,6 +152,8 @@ public class SimpleHttpServer {
 				output = HtmlParser.Parser.parse(request);
 				if (requestMethod.equals("GET")) {
 					writeBack(e, output.toString());
+					e.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+					e.close();
 				}
 				forward.put(Constants.JSON.metaDataKey, output.getMetaDataJSON());
 			} catch (Exception err) {
@@ -189,15 +197,13 @@ public class SimpleHttpServer {
 		}
 		
 		
-		private static void writeBack(HttpExchange c, String out) {
-			try {
-				OutputStream outStream = c.getResponseBody();
-	            outStream.write(out.getBytes());
-	            outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		private static void writeBack(HttpExchange c, String out) throws Exception {
+			System.out.println("Writing: \n" + out);
+			OutputStream outStream = c.getResponseBody();
 			
+			outStream.write(out.getBytes());
+			outStream.close();
+			System.out.println("Done");
 		}
 		
 		private static HttpURLConnection makePostConnection(URL url) throws Exception {

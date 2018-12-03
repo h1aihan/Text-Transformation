@@ -14,11 +14,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.StringJoiner;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 import org.apache.commons.lang3.StringUtils;
 import TextTransformation.Constants;
@@ -87,8 +89,8 @@ public class UnitTestNetworkHandler {
 		try {
 			 con = getResponse("/info");
 			 con.setRequestMethod("POST");
-			 assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, con.getResponseCode());
-			 assertEquals("", getStringResponse(con));
+			 assertEquals(HttpURLConnection.HTTP_OK, con.getResponseCode());
+			 assertEquals(Constants.StaticText.NetworkWelcomeMessage, getStringResponse(con));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -112,6 +114,35 @@ public class UnitTestNetworkHandler {
 		}
 		assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, httpResponse);
 	}
+	
+	@Test
+	public void testGoodRequest() {
+		HttpURLConnection con;
+		HashMap<String,String> arguments = new HashMap<String, String>();
+		arguments.put("html", UnitTestHtmlParser.simpleHtmlString);
+		StringJoiner sj = new StringJoiner("&");
+		String response;
+		int httpResponse = -1;
+		try {
+		
+			for(Entry<String, String> entry : arguments.entrySet())
+			    sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" 
+			         + URLEncoder.encode(entry.getValue(), "UTF-8"));
+			
+			System.out.println(sj.toString());
+			con = getResponse(Constants.Networking.transformAndForward + "&" + sj.toString());
+			con.setRequestMethod("GET");
+			response = getStringResponse(con);
+			
+			httpResponse = con.getResponseCode();
+		} catch (Exception err) {
+			fail("Failed Good request");
+			return;
+		}
+		System.out.println(response);
+		assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
+	}
+	
 	
 	
 	@Test
