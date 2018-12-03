@@ -16,9 +16,9 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
  * Text Transformation HtmlParser class implements methods to parse raw html into ngrams.
  */
 
-public final class HtmlParser {
+public final class Parser {
 	
-	public static class Parser {
+	public static class HtmlParser {
 		/**
 		 * Returns an OutputDataStructure with the parsed ngrams and links.
 		 * 
@@ -26,7 +26,7 @@ public final class HtmlParser {
 		 * @return OutputDataStructure
 		 */
 		public static Output parse(JSONObject json) throws Exception {
-			String html = json.getString("html");
+			String html = json.getString(Constants.JSON.htmlInputKey);
 			ArrayList<String> parsedWords = parse(html);
 			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
