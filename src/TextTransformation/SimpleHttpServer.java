@@ -15,27 +15,28 @@ import org.json.JSONObject;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 // SimpleHttpServer creates a process to handle all requests
 //		It responds to requests in InfoHandler, NetworkHandler, & ForwardHandler
 // See https://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html 
-public class SimpleHttpServlet extends HttpServlet {
+public class SimpleHttpServer {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8021309171908246830L;
 	static private HtmlParser parser = new HtmlParser();
-//	private HttpServer server;
-//	public void setupServer() throws Exception {
-//		server = HttpServer.create(Constants.Networking.socketAddress, 0);
-//		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
-//		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
-//		server.setExecutor(null); // creates a default executor
-//		server.start();
-//	}
-//	public void stopServer() {
-//		server.stop(0);
-//	}
+	private HttpServer server;
+	public void setupServer() throws Exception {
+		server = HttpServer.create(Constants.Networking.socketAddress, 0);
+		server.createContext(Constants.Networking.rootAddress, new InfoHandler());
+		server.createContext(Constants.Networking.transformAndForward, new ForwardHandler());
+		server.setExecutor(null); // creates a default executor
+		server.start();
+	}
+	public void stopServer() {
+		server.stop(0);
+	}
 	public void doGet(HttpServletRequest request, 
 			  HttpServletResponse response) 
 			  throws ServletException, IOException {
@@ -48,15 +49,15 @@ public class SimpleHttpServlet extends HttpServlet {
 	
 	// Creates process, starts running it
 	public static void main(String [ ] args) {
-//		System.out.println("SimpleHttpServer Main Driver");
-//		SimpleHttpServlet httpServer = new SimpleHttpServlet();
-//		try {
-//			httpServer.setupServer();
-//			System.out.println("Server started");
-//			// TODO: Determine how to keep the java server alive
-//		} catch (Exception e) {
-//			System.out.println("Failed to start Java HTTP server-- calling it quits");
-//		}
+		System.out.println("SimpleHttpServer Main Driver");
+		SimpleHttpServer httpServer = new SimpleHttpServer();
+		try {
+			httpServer.setupServer();
+			System.out.println("Server started");
+			// TODO: Determine how to keep the java server alive
+		} catch (Exception e) {
+			System.out.println("Failed to start Java HTTP server-- calling it quits");
+		}
 	}
 	
 	// Returns a nice little info page if you don't know what you're doing
