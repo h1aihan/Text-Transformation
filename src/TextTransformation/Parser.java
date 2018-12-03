@@ -26,7 +26,7 @@ public final class Parser {
 		 * @return OutputDataStructure
 		 */
 		public static Output parse(JSONObject json) throws Exception {
-			String html = json.getString("html");
+			String html = json.getString(Constants.JSON.htmlInputKey);
 			ArrayList<String> parsedWords = parse(html);
 			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
