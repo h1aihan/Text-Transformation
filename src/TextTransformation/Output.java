@@ -5,7 +5,7 @@ import org.json.*;
 
 
 // TODO: Document class definition
-public class OutputDataStructure {
+public class Output {
 	// TODO: Document member variable
 	// TODO: Create public accessors
 	private HashMap<String, NgramMap> wordGrams;
@@ -19,7 +19,7 @@ public class OutputDataStructure {
 	private HashSet<String> links;
 	private HashMap<String, String> metaData;
 	
-	public OutputDataStructure(HashMap<String, NgramMap> ngrams, HashSet<String> links) {
+	public Output(HashMap<String, NgramMap> ngrams, HashSet<String> links) {
 		this.wordGrams = ngrams;
 		this.links=links;
 	}

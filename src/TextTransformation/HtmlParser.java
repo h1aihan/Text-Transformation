@@ -25,12 +25,12 @@ public final class HtmlParser {
 		 * @param JSONObject json
 		 * @return OutputDataStructure
 		 */
-		public static OutputDataStructure parse(JSONObject json) throws Exception {
+		public static Output parse(JSONObject json) throws Exception {
 			String html = json.getString("html");
 			ArrayList<String> parsedWords = parse(html);
 			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
-			return new OutputDataStructure(ngrams,links);
+			return new Output(ngrams,links);
 		}
 		
 		/**
