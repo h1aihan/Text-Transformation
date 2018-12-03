@@ -16,9 +16,9 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
  * Text Transformation HtmlParser class implements methods to parse raw html into ngrams.
  */
 
-public final class HtmlParser {
+public final class Parser {
 	
-	public static class Parser {
+	public static class HtmlParser {
 		/**
 		 * Returns an OutputDataStructure with the parsed ngrams and links.
 		 * 

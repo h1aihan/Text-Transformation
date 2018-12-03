@@ -143,7 +143,7 @@ public class SimpleHttpServer {
 			
 			/* Appears to be a good request, try to parse the included HTML */
 			try {
-				output = HtmlParser.Parser.parse(request);
+				output = Parser.HtmlParser.parse(request);
 				if (requestMethod.equals("GET")) {
 					writeBack(e, output.toString());
 				}
