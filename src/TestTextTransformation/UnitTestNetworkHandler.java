@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -38,26 +37,17 @@ public class UnitTestNetworkHandler {
 	public void tearDown() throws Exception {
 		server.stopServer();
 	}
-
 	
-	@Test
-	public void testInfo()  {
+	private HttpURLConnection getResponse(String request) throws Exception {
 		URL url;
 		HttpURLConnection con;
-		try {
-			url = new URL("http://127.0.0.1:" + Constants.Networking.socketAddress.getPort());
-			con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-		} catch (Exception e) {
-			fail("Could not create connection with self");
-			return;
-		}
-		try {
-			assert(con.getResponseCode() == HttpURLConnection.HTTP_OK);
-		} catch (IOException e) {
-			fail("Did not receive reasonable response");
-		}
-//		StringBuffer content = new StringBuffer();
+		url = new URL("http://127.0.0.1:" + Constants.Networking.socketAddress.getPort() + request);
+		con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		return con;
+	}
+	
+	private String getStringResponse(HttpURLConnection con) {
 		ArrayList<String> content = new ArrayList<String>();
 		try {
 			BufferedReader in = new BufferedReader(
@@ -69,16 +59,63 @@ public class UnitTestNetworkHandler {
 			}
 			in.close();
 		} catch (Exception e) {
-			fail("Problems reading response");
+			//e.printStackTrace();
+			return "";
 		}
 		String response = StringUtils.join(content, "\n");
-
-		assert(response.equals(Constants.StaticText.NetworkWelcomeMessage));
+		return response;
+		
 	}
 	
 	@Test
+	public void testInfo()  {
+		HttpURLConnection con;
+		String response;
+		try {
+			 con = getResponse("/info");
+			 con.setRequestMethod("GET");
+			 assertEquals(HttpURLConnection.HTTP_OK, con.getResponseCode());
+			 response = getStringResponse(con);
+			 assertEquals(response, Constants.StaticText.NetworkWelcomeMessage);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+			return;
+		}		
+		con = null;
+		try {
+			 con = getResponse("/info");
+			 con.setRequestMethod("POST");
+			 assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, con.getResponseCode());
+			 assertEquals("", getStringResponse(con));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+			return;
+		}		
+	}
+	
+	
+	@Test
+	public void testBadEmptyRequest() {
+		HttpURLConnection con;
+		int httpResponse = HttpURLConnection.HTTP_NOT_FOUND;
+		try {
+			con = getResponse(Constants.Networking.transformAndForward);
+			con.setRequestMethod("POST");
+			httpResponse = con.getResponseCode();
+		} catch (Exception err) {
+			fail("Bad BadEmpty response");
+			return;
+		}
+		assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, httpResponse);
+	}
+	
+	
+	@Test
 	public void testRequest() {
-		
 		URL url;
 		URLConnection c;
 		HttpURLConnection httpConnection;
@@ -89,7 +126,7 @@ public class UnitTestNetworkHandler {
 			httpConnection.setRequestMethod("POST"); // PUT is another valid option
 			httpConnection.setDoOutput(true);
 		} catch (Exception e) {
-			fail("Failed to create request");
+			fail("Failed to create simple request");
 			return;
 		}
 		HashMap<String,String> arguments = new HashMap<String, String>();

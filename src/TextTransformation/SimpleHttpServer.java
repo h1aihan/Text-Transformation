@@ -91,64 +91,68 @@ public class SimpleHttpServer {
 			OutputStream os = e.getResponseBody();
 			os.write(response.getBytes());
 			os.close();
+			e.close();
 		}
 	}
 	
 	/**
 	 * ForwardHandler attempts to parse HTML included in a POST request,
-	 * then forward the response to the URL(s) defined in the request 
-	 *
+	 * then forward the response to the URL(s) defined in the request.
 	 */
 	static class ForwardHandler implements HttpHandler {	
 		
 		/**
 		 * Handle TextTransformation requests, including forwards
-		 * 
 		 * @param e the HttpExchange object connecting to the requester
-		 * 
-		 * @effects if e is not a POST request, delegates request to InfoHandler
-		 *          if e does not provide any forwarding addresses, responds with HTTP_BAD_REQUEST
-		 *          if e fails to forward to all forwarding addresses, responds with HTTP_BAD_REQUEST
-		 *          if e fails to forward to one address, but succeeds in forwarding to another, responds with HTTP_PARTIAL
-		 *          if the server cannot parse the HTML in the request, responds with HTTP_INTERNAL_ERROR
+		 *   		if <b>e</b> is not a POST request, delegates request to InfoHandler<br>
+		 *       If <b>e</b> does not provide any forwarding addresses, responds with <b>HTTP_BAD_REQUEST</b><br>
+		 *       If <b>e</b> fails to forward to all forwarding addresses, responds with <b>HTTP_BAD_REQUEST</b><br>
+		 *       If <b>e</b> fails to forward to one address, but succeeds in forwarding to another, responds with <b>HTTP_PARTIAL</b><br>
+		 *       If the server cannot parse the HTML in the request, responds with <b>HTTP_INTERNAL_ERROR</b><br>
 		 */
 		public void handle(HttpExchange e) throws IOException {
+			String requestMethod = e.getRequestMethod();
 			/* ForwardHandler only handles POSTs; redirect to Info page*/
-			if (e.getRequestMethod() != "POST") {
+			if (!requestMethod.equals("POST") && requestMethod.equals("GET")) {
 				new InfoHandler().handle(e);
 				return;
 			}
 			/* The POST request, as a JSON */
 			JSONObject request;
 			JSONObject forward = new JSONObject();
-			int httpStatus = HttpURLConnection.HTTP_BAD_REQUEST;
+			int status = HttpURLConnection.HTTP_BAD_REQUEST;
 			boolean isForwardingToIndexing;
 			boolean isForwardingLinks;
 			Output output;
 			
 			/* Determine if the request is valid */
 			try {
-				request = new JSONObject(e.getRequestBody());
+				request = new JSONObject(e.getRequestHeaders());
+				
 				isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
 				isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
-				if (!isForwardingToIndexing && !isForwardingLinks) 
-					throw new Exception("ERROR: Request must include at least one forwarding address.");
+				if (!isForwardingToIndexing && !isForwardingLinks && !requestMethod.equals("GET")) 
+					throw new Exception("ERROR: POST request must include at least one forwarding address.");
 			} catch (Exception err) {
-				// Unrecoverable error-- invalid request!
-				httpStatus = HttpURLConnection.HTTP_BAD_REQUEST;
-				e.sendResponseHeaders(httpStatus, 0);
+				/* Unrecoverable error-- invalid request! */
+				status = HttpURLConnection.HTTP_BAD_REQUEST;
+				e.sendResponseHeaders(status, 0);
+				e.close();
 				return;
 			} 
-			
 			
 			/* Appears to be a good request, try to parse the included HTML */
 			try {
 				output = HtmlParser.Parser.parse(request);
+				if (requestMethod.equals("GET")) {
+					writeBack(e, output.toString());
+				}
 				forward.put(Constants.JSON.metaDataKey, output.getMetaDataJSON());
 			} catch (Exception err) {
-				// Unrecoverable error-- unable to parse!
-				httpStatus = HttpURLConnection.HTTP_INTERNAL_ERROR;
-				e.sendResponseHeaders(httpStatus, 0);
+				/* Unrecoverable error-- unable to parse! */
+				status = HttpURLConnection.HTTP_INTERNAL_ERROR;
+				e.sendResponseHeaders(status, 0);
+				e.close();
 				return;
 			}
 			
@@ -158,9 +162,9 @@ public class SimpleHttpServer {
 					URL linkURL = new URL(request.getString(Constants.JSON.linkForwardAddressKey));
 					forward.put(Constants.JSON.linksKey, output.getLinksJSON());
 					send(forward.toString(), linkURL);
-					httpStatus = HttpURLConnection.HTTP_OK;
+					status = HttpURLConnection.HTTP_OK;
 				} catch (Exception err) { 
-					// Recoverable error-- cannot send links
+					/* Recoverable error-- cannot send links */
 				}
 			}
 			/* If forward URL provided, attempt to forward parsed HTML */
@@ -169,20 +173,32 @@ public class SimpleHttpServer {
 					URL indexURL = new URL(request.getString(Constants.JSON.indexingForwardAddressKey));
 					if (forward.has(Constants.JSON.linksKey)) 
 						forward.remove(Constants.JSON.linksKey);
-
 					forward.put(Constants.JSON.indexingForwardAddressKey, output.getNGramJSON());
 					send(forward.toString(), indexURL);
-					httpStatus = HttpURLConnection.HTTP_OK;
+					status = HttpURLConnection.HTTP_OK;
 				} catch (Exception err) { 
-					// If two recoverable errors--> bad request!
-					httpStatus = httpStatus == HttpURLConnection.HTTP_PARTIAL ? 
-							HttpURLConnection.HTTP_BAD_REQUEST : 
-								HttpURLConnection.HTTP_PARTIAL;
+					/* If two recoverable errors--> bad request! */
+					status = status == HttpURLConnection.HTTP_PARTIAL ? 
+										HttpURLConnection.HTTP_BAD_REQUEST : 
+										HttpURLConnection.HTTP_PARTIAL;
 				}
 			}
-			e.sendResponseHeaders(httpStatus, 0);
+
+			e.sendResponseHeaders(status, 0);
+			e.close();
 		}
 		
+		
+		private static void writeBack(HttpExchange c, String out) {
+			try {
+				OutputStream outStream = c.getResponseBody();
+	            outStream.write(out.getBytes());
+	            outStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
 		
 		private static HttpURLConnection makePostConnection(URL url) throws Exception {
 			HttpURLConnection post = (HttpURLConnection) url.openConnection();

@@ -21,8 +21,9 @@ public final class Constants {
 	}
 	public static class Networking {
 		public static final String rootAddress = "/";
+		public static final String infoAddress = rootAddress + "info";
 		public static final String transformAndReturn = rootAddress + "transformed";
-		public static final String transformAndForward = rootAddress + "transform";
+		public static final String transformAndForward = rootAddress;
 		public static final InetSocketAddress socketAddress = new InetSocketAddress(8080);
 	}
 	public static class StaticText {
