@@ -17,19 +17,20 @@ public class Output {
 	//  ...
 	// TODO: Create public accessors
 	private HashSet<String> links;
-	private HashMap<String, String> metaData;
+	private JSONObject metaData;
 	
-	public Output(HashMap<String, NgramMap> ngrams, HashSet<String> links) {
+	public Output(HashMap<String, NgramMap> ngrams, HashSet<String> links, JSONObject meta) {
 		this.wordGrams = ngrams;
 		this.links=links;
+		this.metaData = meta;
 	}
 	
 	public JSONObject getMetaDataJSON() throws JSONException  {
-		return new JSONObject(metaData);
+		return new JSONObject(metaData.toString());
 	}
 	
-	public JSONObject getLinksJSON() throws JSONException {		
-		return new JSONObject(links);
+	public HashSet<String> getLinksJSON() throws JSONException {
+		return new HashSet<String>(links);
 	}
 	
 	public JSONObject getNGramJSON() throws JSONException {

@@ -33,6 +33,7 @@ public class UnitTestHtmlParser {
 			" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\r\n" + 
 			"<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\r\n" + 
 			"  <head>\r\n" + 
+			"<meta name=\"description\" content=\"Your description\">\r\n"+
 			"    <title>Your page title here</title>\r\n" + 
 			"  </head>\r\n" + 
 			"  <body>\r\n" + 
@@ -54,8 +55,12 @@ public class UnitTestHtmlParser {
 	@Test
 	// test this output data structure 
 	public void testOutputDataStructure() throws Exception{
-		this.json.put("html",simpleHtmlString);
-		Parser.HtmlParser.parse(json);
+		this.json.put(Constants.JSON.htmlInputKey, simpleHtmlString);
+		this.json.put(Constants.JSON.metaDataKey, new JSONObject());
+		Output res = Parser.HtmlParser.parse(json);
+		System.out.println(res.metaDataToString());
+		System.out.println(res.linksToString());
+		System.out.println(res.ngramToString());
 	}
 
 	@Test

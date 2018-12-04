@@ -1,5 +1,4 @@
 package TextTransformation;
-import java.lang.Math;
 import java.lang.String;
 import java.util.*;
 
@@ -25,10 +24,11 @@ public final class Parser {
 		 */
 		public static Output parse(JSONObject json) throws Exception {
 			String html = json.getString(Constants.JSON.htmlInputKey);
+			JSONObject meta = parseMeta(html, json);
 			ArrayList<String> parsedWords = parse(html);
 			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
-			return new Output(ngrams,links);
+			return new Output(ngrams,links,meta);
 		}
 		
 		/**
@@ -71,6 +71,31 @@ public final class Parser {
 			words.removeIf(word -> word.length() < 2);
 			
 			return words;
+		}
+		
+		/**
+		 * Updates the description under the metadata given in the request.
+		 * 
+		 * @param String html		The html to parse for metadata
+		 * @param JSONObject json	The json request
+		 * @throws JSONException 	If request is badly formatted - no meta field
+		 */
+		static JSONObject parseMeta(String html, JSONObject json) throws JSONException {
+			JSONObject meta = json.getJSONObject(Constants.JSON.metaDataKey);
+			int open = html.indexOf("<meta", 0);
+			int close = html.indexOf(">", open);
+			String substr;
+			while (open != -1) {
+				substr = html.substring(open, close+1);
+				if (substr.contains("name=\"description\"") && substr.contains("content=")) {
+					meta.put("description", substr.replaceAll(".*content=\"(.*)\".*", "$1"));
+					break;
+				}
+				open = html.indexOf("<meta", close);
+				close = html.indexOf(">", open);
+				
+			}
+			return meta;
 		}
 		
 		/**
