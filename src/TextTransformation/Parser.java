@@ -2,8 +2,6 @@ package TextTransformation;
 import java.lang.Math;
 import java.lang.String;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
@@ -161,25 +159,8 @@ public final class Parser {
 		 * @return String
 		 */
 		public static String removeTagAndBody(String html, String tagName) {
-			StringBuffer buffer = new StringBuffer(html);
-			Pattern openingPattern = Pattern.compile("<" + tagName);
-			Pattern closingPattern = Pattern.compile("</"+ tagName + "\\s*>");
-		    Matcher matcher = openingPattern.matcher(html);
-		    int open = 0, close = 0;
-			
-			// Check all occurrences
-		    while (matcher.find()) {
-		    	open = matcher.start();
-		    	matcher = closingPattern.matcher(buffer);
-		    	if (matcher.find()) {
-		    		close = matcher.end();
-		    		buffer.replace(open, close, "");
-		    	} else {
-		    		buffer.replace(open, buffer.length()-1, "");
-		    	}
-		    	matcher = openingPattern.matcher(buffer);
-		    }
-			return buffer.toString();
+			String pattern = "<" + tagName + ".*>.*</" + tagName + "\\s*>";
+			return html.replaceAll(pattern, "");
 		}
 		
 		/**
@@ -189,9 +170,11 @@ public final class Parser {
 		 * @return String
 		 */
 		public static String cleanupTags(String html) {
+			// Removes all attributes from opening tags
+			html = html.replaceAll("(<\\w+)[^>]*(>)", "$1$2");
 			StringBuffer buffer = new StringBuffer(html);
 			int open = buffer.indexOf("<", 0);
-			int close = buffer.indexOf(">", 0);
+			int close = buffer.indexOf(">", open);
 			String tag;
 			while (open != -1) {
 				tag = buffer.substring(open, close+1);
@@ -200,26 +183,11 @@ public final class Parser {
 					buffer.replace(open, close+1, " ");
 					open = buffer.indexOf("<", open);
 				} else {
-					// Remove any modifiers/extraneous spacing inside tag
-					// 		<tag mod=""> --> <tag>
-					// Also pad the tags with spaces to ensure that tags get separated from words
+					// Pad the tags with spaces to ensure that tags get separated from words
 					// 		"word<tag>word" -> "word <tag> word"
-					int mod = tag.indexOf(" ", open);
-					if (mod != -1) {
-						buffer.insert(close+1, " ");
-						if (tag.charAt(tag.length() - 2) == '/') {
-							buffer.replace(open + mod, close - 1, "");
-						}
-						else {
-							buffer.replace(open + mod, close, "");
-						}
-						buffer.insert(open, " ");
-						open = buffer.indexOf("<", open+mod);
-					} else {
-						buffer.insert(close+1, " ");
-						buffer.insert(open, " ");
-						open = buffer.indexOf("<", close);
-					}
+					buffer.insert(close+1, " ");
+					buffer.insert(open, " ");
+					open = buffer.indexOf("<", close);
 				}
 				close = buffer.indexOf(">", open);
 			}

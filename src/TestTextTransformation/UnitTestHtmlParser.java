@@ -69,8 +69,9 @@ public class UnitTestHtmlParser {
 	
 	@Test
 	public void testRemoveTagAndBody() {
-		String text = "<script> hello </script>";
+		String text = "<script> hello </script><style attr=\"someattr\"></style >";
 		String result = Parser.HtmlParser.removeTagAndBody(text, "script");
+		result = Parser.HtmlParser.removeTagAndBody(result, "style");
 		assertEquals(result, "");
 	}
 	
@@ -81,6 +82,18 @@ public class UnitTestHtmlParser {
 		String result = Parser.HtmlParser.cleanupTags(html);
 		assertEquals(result, "  Hello World!  ");
 	}
+	
+	@Test
+	public void testCleanupTagsRemovesAttr() {
+		String html = "<title name=\"something\">hello</title>";
+		String result = Parser.HtmlParser.cleanupTags(html);
+		assertEquals(result, " <title> hello </title> ");
+		
+		
+		String test = "<script> helo there! </script>";
+		System.out.println(test.replaceAll("<script.*>.*</script\\s*>", ""));
+	}
+	
 	
 	@Test
 	public void testIsTag() {
