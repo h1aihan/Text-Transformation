@@ -83,7 +83,6 @@ public final class Parser {
 			ngrams.put("headers", new NgramMap());
 			ngrams.put("title", new NgramMap());
 			
-			
 			NgramMap m;
 			boolean isSpecial = false;	// Special case -> ngram is title or header
 			ArrayList<String> wordsQueue = new ArrayList<String>();
@@ -154,7 +153,7 @@ public final class Parser {
 		 * Example: If tagName = "script" and text = "hello <script>abc</script>world"
 		 * 		The resulting string = "hello world"
 		 * 
-		 * @param String text
+		 * @param String html
 		 * @param String tagName	The tag to remove
 		 * @return String
 		 */
@@ -170,7 +169,7 @@ public final class Parser {
 		 * @return String
 		 */
 		public static String cleanupTags(String html) {
-			// Removes all attributes from opening tags
+			// Removes all attributes from opening tags: <tag attr="a"> -> <tag>
 			html = html.replaceAll("(<\\w+)[^>]*(>)", "$1$2");
 			StringBuffer buffer = new StringBuffer(html);
 			int open = buffer.indexOf("<", 0);
@@ -201,23 +200,10 @@ public final class Parser {
 		 * @return String
 		 */
 		public static String getTagName(String tag) {
-			int start, end;
-			if (tag.startsWith("</")) {
-				start = 2;
-			} else if (tag.startsWith("<")) {
-				start = 1;
-			} else {
-				// Not the correct input!
+			if (!tag.startsWith("<") && !tag.endsWith(">")) {
 				throw new IllegalArgumentException();
 			}
-			end = tag.indexOf(">");
-			if (tag.indexOf(" ") != -1) {
-				end = Math.min(end, tag.indexOf(" "));
-			}
-			if (tag.indexOf("/") != -1 && start != 2) {
-				end = Math.min(end, tag.indexOf("/"));
-			}
-			return tag.substring(start, end);
+			return tag.replaceAll("</?(\\w+)[^>]*>", "$1");
 		}
 		
 		/**
