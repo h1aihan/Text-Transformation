@@ -257,7 +257,7 @@ public final class Parser {
 		 * @return a hash set of url links in the html
 		 */
 		public static HashSet<String> parseUrl(String html){
-			 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.Default);
+			 UrlDetector parser = new UrlDetector(html, UrlDetectorOptions.QUOTE_MATCH);
 			 HashSet<String> links=new HashSet<String>();
 			    List<Url> found = parser.detect();
 			    for(Url url : found) {
