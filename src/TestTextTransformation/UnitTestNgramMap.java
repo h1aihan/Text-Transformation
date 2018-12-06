@@ -76,7 +76,7 @@ public class UnitTestNgramMap {
 		testMap.insert(fourGram);
 		testMap.insert(fiveGram);
 		
-		assertEquals(testMap.getMap().size(), 5);
+		assertEquals(testMap.getMap().size(), 6);
 		assertTrue(testMap.contain("RPI"));
 		assertTrue(testMap.contains(oneGram));
 		assertTrue(testMap.contains(twoGram));
