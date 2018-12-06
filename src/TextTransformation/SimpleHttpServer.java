@@ -10,11 +10,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 
+import org.json.JSONException;
+
 //import javax.servlet.*;
 //import javax.servlet.http.*;
 
 import org.json.JSONObject;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -116,7 +119,7 @@ public class SimpleHttpServer {
 			String requestMethod = e.getRequestMethod();
 			/* ForwardHandler only handles POSTs; redirect to Info page*/
 			if (!requestMethod.equals("POST") && !requestMethod.equals("GET")) {
-				System.out.println("Non-Post or Get made on Transform endpoint");
+				System.out.println("Incorrect request method");
 				new InfoHandler().handle(e);
 				return;
 			}
@@ -133,9 +136,10 @@ public class SimpleHttpServer {
 			try {
 				
 				request = new JSONObject();
-				request.put("html", URLDecoder.decode(e.getRequestHeaders().getFirst("html"), "UTF-8"));
-				request.put("meta", new JSONObject(URLDecoder.decode(e.getRequestHeaders().getFirst("meta"), "UTF-8")));
-				System.out.println("Request!: " + request.toString());
+				
+				
+				request.put("html", e.getRequestHeaders().getFirst("html"));
+				request.put("meta", new JSONObject(e.getRequestHeaders().getFirst("meta")));
 				isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
 				isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
 				if (!isForwardingToIndexing && !isForwardingLinks && !requestMethod.equals("GET")) 
@@ -197,7 +201,6 @@ public class SimpleHttpServer {
 			e.sendResponseHeaders(status, 0);
 			e.close();
 		}
-		
 		
 		private static void writeBack(HttpExchange c, String out) throws Exception {
 			System.out.println("Writing: \n" + out);

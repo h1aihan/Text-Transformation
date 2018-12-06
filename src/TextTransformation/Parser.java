@@ -1,5 +1,6 @@
 package TextTransformation;
 import java.lang.String;
+import java.net.URLDecoder;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,7 @@ public final class Parser {
 		 * @return OutputDataStructure
 		 */
 		public static Output parse(JSONObject json) throws Exception {
-			String html = json.getString(Constants.JSON.htmlInputKey);
+			String html = URLDecoder.decode(json.getString(Constants.JSON.htmlInputKey), "UTF-8");
 			JSONObject meta = parseMeta(html, json);
 			ArrayList<String> parsedWords = parse(html);
 			HashSet<String> links= parseUrl(html);

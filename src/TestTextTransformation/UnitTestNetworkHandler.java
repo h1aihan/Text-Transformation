@@ -141,17 +141,18 @@ public class UnitTestNetworkHandler {
 			con.setRequestMethod("GET");
 			con.setRequestProperty("meta", "{}");
 			con.setRequestProperty("html", URLEncoder.encode(UnitTestHtmlParser.simpleHtmlString, "UTF-8"));
+			System.out.println(con.toString());
 			response = getStringResponse(con);
 			
-			System.out.println("Response: " + response);
+			//System.out.println("Response: " + response);
 			httpResponse = con.getResponseCode();
+			System.out.println(con.getRequestProperty("meta"));
 		} catch (Exception err) {
 			err.printStackTrace();
 			fail("Failed Good request");
 			return;
 		}
-		//assertEquals(response,"{\"meta\":{\"description\":\"Your description\"},\"links\":[\"http://www.w3.org/1999/xhtml\"","http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\"],\"ngram\":{\"all\":{\"4grams\":{\"title here your major\":1,\"of bullet list this\":1,\"page title here your\":1,\"first bullet of bullet\":1,\"is regular text paragraph":1,"heading here this is\":1,\"here this is regular":1,"is the second bullet\":1,\"regular text paragraph first\":1,\"your major heading here\":1,\"paragraph first bullet of]\":1,\"text paragraph first bullet\":1,\"this is regular text\":1,\"here your major heading\":1,\"major heading here this\":1,\"bullet of bullet list\":1,\"your page title here\":1,\"list this is the\":1,\"this is the second\":1,\"bullet list this is\":1},\"1grams\":{\"paragraph\":1,\"major\":1,\"heading\":1,\"text\":1,\"page\":1,\"list\":1,\"title\":1,\"bullet\":3,\"regular\":1,\"first\":1,\"second\":1},\"5grams\":{\"major heading here this is\":1,\"of bullet list this is\":1,\"text paragraph first bullet of\":1,\"bullet list this is the\":1,\"this is regular text paragraph\":1,\"your major heading here this\":1,\"heading here this is regular\":1,\"is regular text paragraph first\":1,\"here your major heading here\":1,\"title here your major heading\":1,\"this is the second bullet\":1,\"your page title here your\":1,\"regular text paragraph first bullet\":1,\"paragraph first bullet of bullet\":1,\"page title here your major\":1,\"first bullet of bullet list\":1,\"here this is regular text":1,"bullet of bullet list this":1,"list this is the second":1},"2grams":{"is regular":1,"of bullet":1,"bullet list":1,"first bullet":1,"page title":1,"is the":1,"this is":2,"the second":1,"text paragraph":1,"your page":1,"second bullet":1,"major heading":1,"here this":1,"paragraph first":1,"list this":1,"your major":1,"regular text":1,"title here":1,"bullet of":1,"heading here":1,"here your":1},"3grams":{"is regular text":1,"first bullet of":1,"this is regular":1,"paragraph first bullet":1,"heading here this":1,"list this is":1,"title here your":1,"bullet of bullet":1,"major heading here":1,"bullet list this":1,"your major heading":1,"page title here":1,"your page title":1,"this is the":1,"is the second":1,"here your major":1,"of bullet list":1,"here this is":1,"text paragraph first":1,"the second bullet":1,"regular text paragraph":1}},"headers":{"4grams":{"your major heading here":1},"1grams":{"major":1,"heading":1},"5grams":{},"2grams":{"major heading":1,"your major":1,"heading here":1},"3grams":{"your major heading":1,"major heading here":1}},"title":{"4grams":{"your page title here":1},"1grams":{"page":1,"title":1},"5grams":{},"2grams":{"title here":1,"page title":1,"your page":1},"3grams":{"page title here":1,"your page title":1}}}}");
-//)
+		
 		assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
 	}
 	
