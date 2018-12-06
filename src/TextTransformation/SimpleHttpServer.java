@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 
 //import javax.servlet.*;
 //import javax.servlet.http.*;
@@ -132,8 +133,9 @@ public class SimpleHttpServer {
 			try {
 				
 				request = new JSONObject();
-				request.put("html", e.getRequestHeaders().getFirst("html"));
-				System.out.println(request.toString());
+				request.put("html", URLDecoder.decode(e.getRequestHeaders().getFirst("html"), "UTF-8"));
+				request.put("meta", new JSONObject(URLDecoder.decode(e.getRequestHeaders().getFirst("meta"), "UTF-8")));
+				System.out.println("Request!: " + request.toString());
 				isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
 				isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
 				if (!isForwardingToIndexing && !isForwardingLinks && !requestMethod.equals("GET")) 
@@ -151,8 +153,8 @@ public class SimpleHttpServer {
 			try {
 				output = Parser.HtmlParser.parse(request);
 				if (requestMethod.equals("GET")) {
-					writeBack(e, output.toString());
 					e.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+					writeBack(e, output.toString());
 					e.close();
 				}
 				forward.put(Constants.JSON.metaDataKey, output.getMetaDataJSON());
