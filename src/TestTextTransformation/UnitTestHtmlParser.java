@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class UnitTestHtmlParser {
 		System.out.println(res.linksToString());
 		System.out.println(res.ngramToString());
 	}
-
+	
 	@Test
 	public void testUrlParser() {
 		//Test simple HtmlString

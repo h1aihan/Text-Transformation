@@ -1,10 +1,14 @@
 package TextTransformation;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.net.URLDecoder;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
+import org.w3c.tidy.Tidy;
 
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
@@ -25,11 +29,31 @@ public final class Parser {
 		 */
 		public static Output parse(JSONObject json) throws Exception {
 			String html = URLDecoder.decode(json.getString(Constants.JSON.htmlInputKey), "UTF-8");
+			HashSet<String> links= parseUrl(html);
+			html = tidy(html);
 			JSONObject meta = parseMeta(html, json);
 			ArrayList<String> parsedWords = parse(html);
-			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
 			return new Output(ngrams,links,meta);
+		}
+		
+		/**
+		 * Cleans up potentially invalid html and makes it well-formed. 
+		 * 
+		 * @param String html
+		 * @return String
+		 */
+		public static String tidy(String html) throws UnsupportedEncodingException {
+			Tidy tidy = new Tidy();
+			tidy.setInputEncoding("UTF-8");
+			tidy.setOutputEncoding("UTF-8");
+			tidy.setQuiet(true);
+			tidy.setShowWarnings(false);
+			tidy.setMakeClean(true);
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes("UTF-8"));
+		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		    tidy.parseDOM(inputStream, outputStream);
+		    return outputStream.toString("UTF-8");
 		}
 		
 		/**
