@@ -134,8 +134,8 @@ public class UnitTestNetworkHandler {
 			con.setRequestMethod("GET");
 			
 			response = getStringResponse(con);
-			System.out.println("Request---" + request);
-			System.out.println("Response--- " + response);
+//			System.out.println("Request---" + request);
+//			System.out.println("Response--- " + response);
 			jsonResponse = new JSONObject(response);
 			httpResponse = con.getResponseCode();
 			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
@@ -143,10 +143,12 @@ public class UnitTestNetworkHandler {
 			
 			assertEquals(1, links.length());
 			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
-			assertEquals(meta.getString("description"), "Your description");
+//			assertEquals(meta.getString("description"), "Your description");
 		
 		} catch (JSONException err) {
-			fail("Failed Good request because of non-JSON response:\n" + response + "\nRequest: " + request);
+			fail("Failed Good request because of non-JSON response:\n" + response 
+					+ "\nRequest: " + request 
+					+ "\nJSONException: " + err.getMessage());
 			return;
 		} catch (Exception err) {
 			fail("Failed Good request");
@@ -154,7 +156,42 @@ public class UnitTestNetworkHandler {
 		} 
 		
 	}
-	
+	@Test
+	public void testGoodExternalRequest() {
+		HttpURLConnection con;
+		String response = "Not initialized";
+		String request = "Not initialized";
+		JSONObject jsonResponse;
+		int httpResponse = -1;
+		try {
+			request = "/?get_url=https://science.rpi.edu/computer-science";
+			con = getResponse(request);
+			con.setRequestMethod("GET");
+			
+			response = getStringResponse(con);
+//			System.out.println("Request---" + request);
+//			System.out.println("Response--- " + response);
+			jsonResponse = new JSONObject(response);
+			httpResponse = con.getResponseCode();
+			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
+			JSONArray links = jsonResponse.getJSONArray("links");
+			
+			assertEquals(82, links.length());
+			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
+//			assertEquals(meta.getString("description"), "Your description");
+		
+		} catch (JSONException err) {
+			fail("Failed Good request because of non-JSON response:\n" + response 
+					+ "\nRequest: " + request 
+					+ "\nJSONException: " + err.getMessage());
+			return;
+		} catch (Exception err) {
+			err.printStackTrace();
+
+			fail("Failed Good request");
+			return;
+		} 
+	}
 	
 	
 	@Test

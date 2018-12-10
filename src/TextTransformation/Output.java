@@ -62,11 +62,12 @@ public class Output {
 			concatenated.put("meta", getMetaDataJSON());
 		} catch (Exception e) {}
 		try {
-			concatenated.put("links", getLinksJSON());
-		} catch (Exception e) {}
-		try {
 			concatenated.put("ngram", getNGramJSON());
 		} catch (Exception e) {}
+		try {
+			concatenated.put("links", getLinksJSON());
+		} catch (Exception e) {}
+		
 		
 		return concatenated.toString();
 	}

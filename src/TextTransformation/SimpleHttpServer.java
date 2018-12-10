@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -239,21 +242,37 @@ public class SimpleHttpServer {
 		}
 		
 		public static String get(String surl) {
-			String content = "";
-			URLConnection connection = null;
+			StringBuffer response = new StringBuffer();
+			HttpURLConnection connection = null;
+			
 			try {
-//			  connection =  .openConnection();
-			  BufferedReader in = new BufferedReader(
-				        new InputStreamReader(new URL(surl).openStream()));
+				
+				CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+				connection = (HttpURLConnection)new URL(surl).openConnection();
+				connection.setRequestMethod("GET");
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36");
+				System.out.println("\nSending 'GET' request to URL : " + surl);
+			    System.out.println("Response Code : " + connection.getResponseCode());
+			    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			    String inputLine;
+			    
 
-				        String inputLine;
-				        while ((inputLine = in.readLine()) != null)
-				            content += inputLine + "\n";
-				        in.close();
+			    while ((inputLine = in.readLine()) != null) {
+			        response.append(inputLine);
+			    }
+			    in.close();
+//				BufferedReader in = new BufferedReader(
+//				        new InputStreamReader(connection.getInputStream()),
+//			  			
+//				        String inputLine;
+//				        while ((inputLine = in.readLine()) != null)
+//				            content += inputLine;
+//				        in.close();
 			}catch ( Exception ex ) {
 			    ex.printStackTrace();
 			}
-			return content;
+			System.out.println(response.toString());
+			return response.toString();
 			
 		}
 		
