@@ -40,7 +40,7 @@ public final class Constants {
 	}
 	
 	public static class Parsing {
-		public static final String delimiters = "[\\s\\\".!?,;-]+";
+		public static final String delimiters = "[\\s\\\".)(!?,;:-]+";
 		private static final String[] tagValues = {"title", "h1", "h2", "h3", "h4", "h5", "h6"};
 		public static final Set<String> prioritizedTags = new HashSet<>(Arrays.asList(tagValues)); 
 	}
