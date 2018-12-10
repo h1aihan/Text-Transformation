@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 import org.w3c.tidy.Tidy;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
@@ -45,17 +47,20 @@ public final class Parser {
 		 * @param String html
 		 * @return String
 		 */
-		public static String tidy(String html) throws UnsupportedEncodingException {
-			Tidy tidy = new Tidy();
-			tidy.setInputEncoding("UTF-8");
-			tidy.setOutputEncoding("UTF-8");
-			tidy.setQuiet(true);
-			tidy.setShowWarnings(false);
-			tidy.setMakeClean(true);
-			ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes("UTF-8"));
-		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		    tidy.parseDOM(inputStream, outputStream);
-		    return outputStream.toString("UTF-8");
+		public static String tidy(String html) {
+			Whitelist wt = Whitelist.none();
+			wt.addTags("title", "h1", "h2", "h3", "h4", "h5", "h6");
+			return Jsoup.clean(html, wt);
+//			Tidy tidy = new Tidy();
+//			tidy.setInputEncoding("UTF-8");
+//			tidy.setOutputEncoding("UTF-8");
+//			tidy.setQuiet(true);
+//			tidy.setShowWarnings(false);
+//			tidy.setMakeClean(true);
+//			ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes("UTF-8"));
+//		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//		    tidy.parseDOM(inputStream, outputStream);
+//		    return outputStream.toString("UTF-8");
 		}
 
 		/**
