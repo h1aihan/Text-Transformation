@@ -1,30 +1,13 @@
 package TestTextTransformation;
 import TextTransformation.*;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.*;
 import org.junit.*;
-
 import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Iterator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-
-import com.linkedin.urls.Url;
-import com.linkedin.urls.detection.UrlDetector;
-import com.linkedin.urls.detection.UrlDetectorOptions;
 
 public class UnitTestHtmlParser {
 	private JSONObject json= new JSONObject(); 
@@ -62,7 +45,7 @@ public class UnitTestHtmlParser {
 		System.out.println(res.linksToString());
 		System.out.println(res.ngramToString());
 	}
-
+	
 	@Test
 	public void testUrlParser() {
 		//Test simple HtmlString

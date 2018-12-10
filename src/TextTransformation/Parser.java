@@ -1,10 +1,14 @@
 package TextTransformation;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.net.URLDecoder;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
+import org.w3c.tidy.Tidy;
 
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
@@ -15,29 +19,49 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
  */
 
 public final class Parser {
-	
+
 	public static class HtmlParser {
 		/**
 		 * Returns an OutputDataStructure with the parsed ngrams and links.
-		 * 
+		 *
 		 * @param JSONObject json
 		 * @return OutputDataStructure
 		 */
 		public static Output parse(JSONObject json) throws Exception {
-			String html = json.getString(Constants.JSON.htmlInputKey);
+			String html = URLDecoder.decode(json.getString(Constants.JSON.htmlInputKey), "UTF-8");
+			HashSet<String> links= parseUrl(html);
+			html = tidy(html);
 			JSONObject meta = parseMeta(html, json);
 			ArrayList<String> parsedWords = parse(html);
-			HashSet<String> links= parseUrl(html);
 			HashMap<String, NgramMap> ngrams = createNgrams(parsedWords);
 			return new Output(ngrams,links,meta);
 		}
-		
+
+		/**
+		 * Cleans up potentially invalid html and makes it well-formed.
+		 *
+		 * @param String html
+		 * @return String
+		 */
+		public static String tidy(String html) throws UnsupportedEncodingException {
+			Tidy tidy = new Tidy();
+			tidy.setInputEncoding("UTF-8");
+			tidy.setOutputEncoding("UTF-8");
+			tidy.setQuiet(true);
+			tidy.setShowWarnings(false);
+			tidy.setMakeClean(true);
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes("UTF-8"));
+		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		    tidy.parseDOM(inputStream, outputStream);
+		    return outputStream.toString("UTF-8");
+		}
+
 		/**
 		 * Parses the given string:
 		 * 		changes all characters to lowercase,
 		 * 		removes unwanted tags,
 		 * 		and puts all valid words into a list.
-		 * 
+		 *
 		 * @param String text : The text to parse
 		 */
 		public static ArrayList<String> parse(String text) {
@@ -48,10 +72,10 @@ public final class Parser {
 			text = removeTagAndBody(text, "style");
 			text = removeTagAndBody(text, "script");
 			text = cleanupTags(text);
-			
+
 			// Split string into words
 			ArrayList<String> words = new ArrayList<String>(Arrays.asList(text.split(Constants.Parsing.delimiters)));
-			
+
 			// Check for certain allowed punctuation
 			//		-> only single quotation mark is allowed
 			int occurrences = 0;
@@ -67,16 +91,16 @@ public final class Parser {
 					}
 				}
 			}
-			
+
 			// Remove if length < 2
 			words.removeIf(word -> word.length() < 2);
-			
+
 			return words;
 		}
-		
+
 		/**
 		 * Updates the description under the metadata given in the request.
-		 * 
+		 *
 		 * @param String html		The html to parse for metadata
 		 * @param JSONObject json	The json request
 		 * @throws JSONException 	If request is badly formatted - no meta field
@@ -94,11 +118,11 @@ public final class Parser {
 				}
 				open = html.indexOf("<meta", close);
 				close = html.indexOf(">", open);
-				
+
 			}
 			return meta;
 		}
-		
+
 		/**
 		 * Populates the ngram hashmap with 1-5grams using the parsed list of words.
 		 */
@@ -108,7 +132,7 @@ public final class Parser {
 			ngrams.put("all", new NgramMap());
 			ngrams.put("headers", new NgramMap());
 			ngrams.put("title", new NgramMap());
-			
+
 			NgramMap m;
 			boolean isSpecial = false;	// Special case -> ngram is title or header
 			ArrayList<String> wordsQueue = new ArrayList<String>();
@@ -144,7 +168,7 @@ public final class Parser {
 						m = null;
 						isSpecial = false;
 					}
-					
+
 					// Ignore if stop word.
 					Set<String> stopWords=Constants.StaticCollections.StopWords;
 					if (!stopWords.contains(word)) {
@@ -173,12 +197,12 @@ public final class Parser {
 			}
 			return ngrams;
 		}
-		
+
 		/**
 		 * Finds and removes the given tag and body from String 'text'.
 		 * Example: If tagName = "script" and text = "hello <script>abc</script>world"
 		 * 		The resulting string = "hello world"
-		 * 
+		 *
 		 * @param String html
 		 * @param String tagName	The tag to remove
 		 * @return String
@@ -187,10 +211,10 @@ public final class Parser {
 			String pattern = "<" + tagName + ".*>.*</" + tagName + "\\s*>";
 			return html.replaceAll(pattern, "");
 		}
-		
+
 		/**
 		 * Finds and removes all tags that are not pre-defined as a prioritized tag from the given string.
-		 * 
+		 *
 		 * @param String 	html
 		 * @return String
 		 */
@@ -218,10 +242,10 @@ public final class Parser {
 			}
 			return buffer.toString();
 		}
-		
+
 		/**
 		 * Returns the tag name. If not given a valid tag, returns an empty string literal.
-		 * 
+		 *
 		 * @param String tag	The tag to identify. (Expected inputs: <tag>, </tag>, <tag/>, <tag attribute="a">)
 		 * @return String
 		 */
@@ -231,27 +255,27 @@ public final class Parser {
 			}
 			return tag.replaceAll("</?(\\w+)[^>]*>", "$1");
 		}
-		
+
 		/**
 		 * Returns true if the given text is a valid tag, else returns false.
-		 * 
+		 *
 		 * @param String text
 		 * @return boolean
 		 */
 		public static boolean isTag(String text) {
 			return text.startsWith("<") && text.endsWith(">");
 		}
-		
+
 		/**
 		 * Returns true if the given word is an opening tag, else returns false.
-		 * 
+		 *
 		 * @param String tag
 		 * @return boolean
 		 */
 		public static boolean isOpeningTag(String tag) {
 			return isTag(tag) && !tag.startsWith("</");
 		}
-		
+
 		/**
 		 *  Parse a string of html, extract links
 		 * @param String html
@@ -266,6 +290,6 @@ public final class Parser {
 				}
 			    return links;
 		}
-		
+
 	}
 }
