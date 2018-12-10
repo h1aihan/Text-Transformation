@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
@@ -67,10 +69,11 @@ public final class Parser {
 		public static ArrayList<String> parse(String text) {
 			// Convert to lower-case
 			text = text.toLowerCase();
-
+			
 			// Removal of unwanted tags
 			text = removeTagAndBody(text, "style");
 			text = removeTagAndBody(text, "script");
+
 			text = cleanupTags(text);
 
 			// Split string into words
@@ -208,8 +211,24 @@ public final class Parser {
 		 * @return String
 		 */
 		public static String removeTagAndBody(String html, String tagName) {
-			String pattern = "<" + tagName + ".*>.*</" + tagName + "\\s*>";
-			return html.replaceAll(pattern, "");
+			StringBuffer buffer = new StringBuffer(html);
+			Pattern openingPattern = Pattern.compile("<" + tagName);
+			Pattern closingPattern = Pattern.compile("</"+ tagName + "\\s*>");
+			Matcher matcher = openingPattern.matcher(html);
+			int open = 0, close = 0;
+			while (matcher.find()) {
+				open = matcher.start();
+				matcher = closingPattern.matcher(buffer);
+				if (matcher.find()) {
+					close = matcher.end();
+					buffer.replace(open, close, "");
+					
+				}else {
+					buffer.replace(open, buffer.length()-1, "");
+				}
+				matcher = openingPattern.matcher(buffer);
+			}
+			return buffer.toString();
 		}
 
 		/**
