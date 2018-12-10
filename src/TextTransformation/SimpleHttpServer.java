@@ -127,7 +127,7 @@ public class SimpleHttpServer {
 				e.close();
 				return;
 			} else if (stringQuery == null) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide some HTML to parse ('html') or a webpage to parse ('html_url').", HttpURLConnection.HTTP_BAD_REQUEST);
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "Please provide some HTML to parse ('html') or a webpage to parse ('html_url').", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			}
@@ -240,13 +240,14 @@ public class SimpleHttpServer {
 			BufferedReader in = null;
 			
 			try {
-				
 				CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 				connection = (HttpURLConnection)new URL(surl).openConnection();
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36");
 				System.out.println("\nSending 'GET' request to URL : " + surl);
 			    System.out.println("Response Code : " + connection.getResponseCode());
+				System.out.println("Response String : " + response.toString());
+
 			    in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			    String inputLine;
 			    
@@ -264,7 +265,6 @@ public class SimpleHttpServer {
 			} catch(IOException ex) {
 				ex.printStackTrace();
 			}
-			System.out.println(response.toString());
 			return response.toString();
 			
 		}

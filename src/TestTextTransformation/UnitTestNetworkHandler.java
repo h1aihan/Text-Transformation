@@ -134,8 +134,6 @@ public class UnitTestNetworkHandler {
 			con.setRequestMethod("GET");
 			
 			response = getStringResponse(con);
-//			System.out.println("Request---" + request);
-//			System.out.println("Response--- " + response);
 			jsonResponse = new JSONObject(response);
 			httpResponse = con.getResponseCode();
 			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
@@ -143,7 +141,6 @@ public class UnitTestNetworkHandler {
 			
 			assertEquals(1, links.length());
 			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
-//			assertEquals(meta.getString("description"), "Your description");
 		
 		} catch (JSONException err) {
 			fail("Failed Good request because of non-JSON response:\n" + response 
@@ -169,8 +166,6 @@ public class UnitTestNetworkHandler {
 			con.setRequestMethod("GET");
 			
 			response = getStringResponse(con);
-//			System.out.println("Request---" + request);
-//			System.out.println("Response--- " + response);
 			jsonResponse = new JSONObject(response);
 			httpResponse = con.getResponseCode();
 			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
@@ -178,7 +173,6 @@ public class UnitTestNetworkHandler {
 			
 			assertEquals(82, links.length());
 			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
-//			assertEquals(meta.getString("description"), "Your description");
 		
 		} catch (JSONException err) {
 			fail("Failed Good request because of non-JSON response:\n" + response 
@@ -193,64 +187,5 @@ public class UnitTestNetworkHandler {
 		} 
 	}
 	
-	
-	@Test
-	public void testRequest() {
-		// TODO: Complete test...
-		return;
-		/*
-		URL url;
-		URLConnection c;
-		HttpURLConnection httpConnection;
-		try {
-			url = new URL("http://127.0.0.1:" + Constants.Networking.socketAddress.getPort());
-			c = url.openConnection();
-			httpConnection = (HttpURLConnection)c;
-			httpConnection.setRequestMethod("POST"); // PUT is another valid option
-			httpConnection.setDoOutput(true);
-		} catch (Exception e) {
-			fail("Failed to create simple request");
-			return;
-		}
-		return;
-		HashMap<String,String> arguments = new HashMap<String, String>();
-		// TODO: Set arguments
-		
-		/*
-		 * 
-		 * { 
-			 metadata: {
-			      url: "www.rpi.edu"
-			      access_time: "2018-10-9T10:00:00Z" (ISO 8061)
-			      forward_address: "some.aws.address.com/...." or NULL
-			            }
-			  content: { "<doctype HTML!>....</HTML>" }
-			}
-		 * 
-		 
-		
-		StringJoiner joinedParams = new StringJoiner("&");
-		for(HashMap.Entry<String,String> entry : arguments.entrySet()) {
-			try {
-				joinedParams.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" 
-						+ URLEncoder.encode(entry.getValue(), "UTF-8"));
-			} catch (UnsupportedEncodingException e) {}
-		}
-		byte[] out = joinedParams.toString().getBytes(StandardCharsets.UTF_8);
-		int length = out.length;
-
-		httpConnection.setFixedLengthStreamingMode(length);
-		httpConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-		try {
-			httpConnection.connect();
-			try(OutputStream os = httpConnection.getOutputStream()) {
-				os.write(out);
-			}
-
-		} catch (Exception e){
-			fail("Could not send request");
-		}
-		*/
-	}
 
 }
