@@ -242,7 +242,7 @@ public class SimpleHttpServer {
 			String content = null;
 			URLConnection connection = null;
 			try {
-			  connection =  new URL("http://www.google.com").openConnection();
+			  connection =  new URL(surl).openConnection();
 			  Scanner scanner = new Scanner(connection.getInputStream());
 			  scanner.useDelimiter("\\Z");
 			  content = scanner.next();
