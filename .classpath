@@ -12,6 +12,5 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/evajiang/Downloads/jtidy-r938/jtidy-r938.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

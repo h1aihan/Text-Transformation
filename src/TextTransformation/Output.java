@@ -46,14 +46,14 @@ public class Output {
 	}
 	
 	public String metaDataToString() throws JSONException {
-		return getMetaDataJSON().toString();
+		return getMetaDataJSON().toString(2);
 	}
 	
 	public String linksToString() throws JSONException {
 		return getLinksJSON().toString();
 	}
 	public String ngramToString() throws JSONException {
-		return getNGramJSON().toString();
+		return getNGramJSON().toString(2);
 	}
 
 	public String toString() {

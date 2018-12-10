@@ -141,7 +141,7 @@ public class UnitTestNetworkHandler {
 			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
 			JSONArray links = jsonResponse.getJSONArray("links");
 			
-			assertEquals(2, links.length());
+			assertEquals(1, links.length());
 			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
 			assertEquals(meta.getString("description"), "Your description");
 		

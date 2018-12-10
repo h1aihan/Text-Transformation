@@ -8,18 +8,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.json.JSONException;
+import java.net.URLConnection;
+import java.util.Scanner;
 
 //import javax.servlet.*;
 //import javax.servlet.http.*;
 
 import org.json.JSONObject;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -124,11 +120,11 @@ public class SimpleHttpServer {
 			
 			/* ForwardHandler only handles GETs and POSTs; redirect to Info page*/
 			if (!isPOST && !isGET) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease use POST or GET.");
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease use POST or GET.", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			} else if (stringQuery == null) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide a string query.");
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide a string query.", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			}
@@ -144,10 +140,21 @@ public class SimpleHttpServer {
 			
 			Output output;
 			
+//			if (!request.has(Constants.JSON.htmlInputKey) && !request.has("get")) {
+//				writeBack(e, Constants.StaticText.NetworkDefaultError + "\nPlease provide HTML", sun.net.www.protocol.http.HttpURLConnection.HTTP_BAD_REQUEST);
+//				return; 
+//			}
+			
+			
+			
 			/* Determine if the request is valid, assemble request JSON */
 			try {
+				
 				if (!request.has(Constants.JSON.metaDataKey))
 					request.put(Constants.JSON.metaDataKey, new JSONObject());
+				if (request.has("get_url")) {
+					request.put(Constants.JSON.htmlInputKey, get(request.getString("get_url")).replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B"));
+				}
 				if (isPOST && !isForwardingToIndexing && !isForwardingLinks) 
 					throw new Exception("POST request must include at least one forwarding address.");	
 			} catch (Exception err) {
@@ -229,6 +236,21 @@ public class SimpleHttpServer {
 		        
 		    }  
 		    return map;  
+		}
+		
+		public static String get(String surl) {
+			String content = null;
+			URLConnection connection = null;
+			try {
+			  connection =  new URL("http://www.google.com").openConnection();
+			  Scanner scanner = new Scanner(connection.getInputStream());
+			  scanner.useDelimiter("\\Z");
+			  content = scanner.next();
+			}catch ( Exception ex ) {
+			    ex.printStackTrace();
+			}
+			return content;
+			
 		}
 		
 		private static void writeBack(HttpExchange c, String out) {
