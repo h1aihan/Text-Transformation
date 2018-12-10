@@ -24,6 +24,10 @@ import org.junit.Test;
 import com.sun.net.httpserver.Headers;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import TextTransformation.Constants;
 import TextTransformation.SimpleHttpServer;
 
@@ -64,7 +68,7 @@ public class UnitTestNetworkHandler {
 			in.close();
 		} catch (Exception e) {
 			//e.printStackTrace();
-			return "No string response";
+			return "{response: \"No string response\"}";
 		}
 		String response = StringUtils.join(content, "\n");
 		return response;
@@ -120,40 +124,35 @@ public class UnitTestNetworkHandler {
 	@Test
 	public void testGoodRequest() {
 		HttpURLConnection con;
-		HashMap<String,String> arguments = new HashMap<String, String>();
-		arguments.put("html", UnitTestHtmlParser.simpleHtmlString);
-		StringJoiner sj = new StringJoiner("&");
-		String response;
+		String response = "Not initialized";
+		String request = "Not initialized";
+		JSONObject jsonResponse;
 		int httpResponse = -1;
 		try {
-		
-//			for(Entry<String, String> entry : arguments.entrySet())
-//			    sj.add(URLEncoder.encode(entry.getKey() + "=" 
-//			         + URLEncoder.encode(entry.getValue(), "UTF-8"));
-//				sj.add(entry.getKey()+ "=" 
-//				         + entry.getValue());
-			
-//			System.out.println(sj.toString());
-			
-		
-			String request = Constants.Networking.transformAndForward;
+			request = Constants.Networking.transformAndForward + "?" + Constants.JSON.htmlInputKey + "=" + URLEncoder.encode(UnitTestHtmlParser.simpleHtmlString, "UTF-8");
 			con = getResponse(request);
 			con.setRequestMethod("GET");
-			con.setRequestProperty("meta", "{}");
-			con.setRequestProperty("html", URLEncoder.encode(UnitTestHtmlParser.simpleHtmlString, "UTF-8"));
-			System.out.println(con.toString());
-			response = getStringResponse(con);
 			
-			//System.out.println("Response: " + response);
+			response = getStringResponse(con);
+			System.out.println("Request---" + request);
+			System.out.println("Response--- " + response);
+			jsonResponse = new JSONObject(response);
 			httpResponse = con.getResponseCode();
-			System.out.println(con.getRequestProperty("meta"));
+			JSONObject meta = new JSONObject(jsonResponse.get("meta").toString());
+			JSONArray links = jsonResponse.getJSONArray("links");
+			
+			assertEquals(2, links.length());
+			assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
+			assertEquals(meta.getString("description"), "Your description");
+		
+		} catch (JSONException err) {
+			fail("Failed Good request because of non-JSON response:\n" + response + "\nRequest: " + request);
+			return;
 		} catch (Exception err) {
-			err.printStackTrace();
 			fail("Failed Good request");
 			return;
-		}
+		} 
 		
-		assertEquals(HttpURLConnection.HTTP_OK, httpResponse);
 	}
 	
 	

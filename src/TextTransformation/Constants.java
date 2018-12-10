@@ -17,7 +17,7 @@ public final class Constants {
 		public static final String metaDataKey = "meta";
 		public static final String linksKey = "links";
 		public static final String ngramsKey = "ngrams";
-		public static final String htmlInputKey = "html";
+		public static final String htmlInputKey = "raw_html";
 		
 	}
 	public static class Networking {

@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 
@@ -116,60 +118,67 @@ public class SimpleHttpServer {
 		 *       If the server cannot parse the HTML in the request, responds with <b>HTTP_INTERNAL_ERROR</b><br>
 		 */
 		public void handle(HttpExchange e) throws IOException {
-			String requestMethod = e.getRequestMethod();
-			/* ForwardHandler only handles POSTs; redirect to Info page*/
-			if (!requestMethod.equals("POST") && !requestMethod.equals("GET")) {
-				System.out.println("Incorrect request method");
-				new InfoHandler().handle(e);
+			boolean isGET = e.getRequestMethod().equals("GET");
+			boolean isPOST = e.getRequestMethod().equals("POST");
+			String stringQuery = e.getRequestURI().getQuery();
+			
+			/* ForwardHandler only handles GETs and POSTs; redirect to Info page*/
+			if (!isPOST && !isGET) {
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease use POST or GET.");
+				e.close();
+				return;
+			} else if (stringQuery == null) {
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide a string query.");
+				e.close();
 				return;
 			}
-			/* The POST request, as a JSON */
-			JSONObject request;
-			JSONObject forward = new JSONObject();
-			int status = HttpURLConnection.HTTP_BAD_REQUEST;
 			
-			boolean isForwardingToIndexing;
-			boolean isForwardingLinks;
+			/* The POST request, as a JSON */
+			JSONObject request = getQueryMap(stringQuery);
+			JSONObject forward = new JSONObject();
+			
+			int status = HttpURLConnection.HTTP_BAD_REQUEST;
+	
+			boolean isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
+			boolean isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
+			
 			Output output;
 			
-			/* Determine if the request is valid */
+			/* Determine if the request is valid, assemble request JSON */
 			try {
-				
-				request = new JSONObject();
-				
-				
-				request.put("html", e.getRequestHeaders().getFirst("html"));
-				request.put("meta", new JSONObject(e.getRequestHeaders().getFirst("meta")));
-				isForwardingToIndexing = request.has(Constants.JSON.indexingForwardAddressKey);
-				isForwardingLinks = request.has(Constants.JSON.linkForwardAddressKey);
-				if (!isForwardingToIndexing && !isForwardingLinks && !requestMethod.equals("GET")) 
-					throw new Exception("ERROR: POST request must include at least one forwarding address.");
-				
+				if (!request.has(Constants.JSON.metaDataKey))
+					request.put(Constants.JSON.metaDataKey, new JSONObject());
+				if (isPOST && !isForwardingToIndexing && !isForwardingLinks) 
+					throw new Exception("POST request must include at least one forwarding address.");	
 			} catch (Exception err) {
 				/* Unrecoverable error-- invalid request! */
 				status = HttpURLConnection.HTTP_BAD_REQUEST;
-				e.sendResponseHeaders(status, 0);
+				writeBack(e, "{error : \"Cannot transform raw HTML into JSON: " + err.getMessage() + "\"}", status);
 				e.close();
 				return;
 			} 
-			
+
 			/* Appears to be a good request, try to parse the included HTML */
+			String getResponse = "None";
 			try {
+
 				output = Parser.HtmlParser.parse(request);
-				if (requestMethod.equals("GET")) {
-					e.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-					writeBack(e, output.toString());
-					e.close();
-				}
+
 				forward.put(Constants.JSON.metaDataKey, output.getMetaDataJSON());
+
+				getResponse = output.toString();
 			} catch (Exception err) {
 				/* Unrecoverable error-- unable to parse! */
-				status = HttpURLConnection.HTTP_INTERNAL_ERROR;
-				e.sendResponseHeaders(status, 0);
+				status = HttpURLConnection.HTTP_SEE_OTHER;
+				writeBack(e, "{error : \"Cannot parse HTML: " + err.getMessage() + "\"\n, "
+						+ "request: " + request + "}", status);
 				e.close();
 				return;
 			}
 			
+			if (isGET) {
+				writeBack(e, getResponse);
+			}
 			/* If forward URL provided, attempt to forward links found in parsed HTML */
 			if (isForwardingLinks) {
 				try {					
@@ -197,18 +206,46 @@ public class SimpleHttpServer {
 										HttpURLConnection.HTTP_PARTIAL;
 				}
 			}
-
+			
 			e.sendResponseHeaders(status, 0);
 			e.close();
 		}
 		
-		private static void writeBack(HttpExchange c, String out) throws Exception {
-			System.out.println("Writing: \n" + out);
-			OutputStream outStream = c.getResponseBody();
-			
-			outStream.write(out.getBytes());
-			outStream.close();
-			System.out.println("Done");
+		public static JSONObject getQueryMap(String query)  
+		{  
+		    String[] params = query.split("&");  
+		    JSONObject map = new JSONObject();  
+		    for (String param : params)  
+		    {  
+		        String name = param.split("=")[0];  
+		        String value = param.split("=")[1];  
+		        try {
+		        	if (name.length() > 2) 
+		        		map.put(name, value);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}  
+		        
+		    }  
+		    return map;  
+		}
+		
+		private static void writeBack(HttpExchange c, String out) {
+			writeBack(c, out, HttpURLConnection.HTTP_OK);
+		}
+		
+		
+		private static void writeBack(HttpExchange c, String out, int HttpResponse) {
+			try {
+				c.sendResponseHeaders(HttpResponse, 0);
+				OutputStream outStream = c.getResponseBody();
+				outStream.write(out.getBytes());
+				outStream.close();
+			} catch (Exception err) {
+				err.printStackTrace();
+				return;
+			}
 		}
 		
 		private static HttpURLConnection makePostConnection(URL url) throws Exception {
@@ -224,7 +261,6 @@ public class SimpleHttpServer {
 		// Send string parameters "parameters" to the URL "to"
 		private void send(String parameters, URL destination) throws Exception {
 			HttpURLConnection post = ForwardHandler.makePostConnection(destination);
-
 			try {
 				post.setRequestProperty("Content-Length", "" + 
 						Integer.toString(parameters.getBytes().length));
@@ -264,3 +300,6 @@ public class SimpleHttpServer {
 //	}
 	
 }
+
+
+
