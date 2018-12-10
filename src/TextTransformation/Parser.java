@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.*;
-import org.w3c.tidy.Tidy;
+//import org.w3c.tidy.Tidy;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
