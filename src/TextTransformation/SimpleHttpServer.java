@@ -239,13 +239,17 @@ public class SimpleHttpServer {
 		}
 		
 		public static String get(String surl) {
-			String content = null;
+			String content = "";
 			URLConnection connection = null;
 			try {
-			  connection =  new URL(surl).openConnection();
-			  Scanner scanner = new Scanner(connection.getInputStream());
-			  scanner.useDelimiter("\\Z");
-			  content = scanner.next();
+//			  connection =  .openConnection();
+			  BufferedReader in = new BufferedReader(
+				        new InputStreamReader(new URL(surl).openStream()));
+
+				        String inputLine;
+				        while ((inputLine = in.readLine()) != null)
+				            content += inputLine + "\n";
+				        in.close();
 			}catch ( Exception ex ) {
 			    ex.printStackTrace();
 			}
