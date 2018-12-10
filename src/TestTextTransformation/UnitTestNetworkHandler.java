@@ -164,7 +164,7 @@ public class UnitTestNetworkHandler {
 		JSONObject jsonResponse;
 		int httpResponse = -1;
 		try {
-			request = "/?get_url=https://science.rpi.edu/computer-science";
+			request = "/?html_url=https://science.rpi.edu/computer-science";
 			con = getResponse(request);
 			con.setRequestMethod("GET");
 			

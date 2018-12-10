@@ -32,7 +32,7 @@ public final class Parser {
 		 * @return OutputDataStructure
 		 */
 		public static Output parse(JSONObject json) throws Exception {
-			String html = URLDecoder.decode(json.getString(Constants.JSON.htmlInputKey), "UTF-8");
+			String html = json.getString(Constants.JSON.htmlInputKey);
 			HashSet<String> links= parseUrl(html);
 			html = tidy(html);
 			JSONObject meta = parseMeta(html, json);

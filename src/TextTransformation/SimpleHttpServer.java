@@ -127,7 +127,7 @@ public class SimpleHttpServer {
 				e.close();
 				return;
 			} else if (stringQuery == null) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide a string query.", HttpURLConnection.HTTP_BAD_REQUEST);
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease provide some HTML to parse ('html') or a webpage to parse ('html_url').", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			}
@@ -143,20 +143,13 @@ public class SimpleHttpServer {
 			
 			Output output;
 			
-//			if (!request.has(Constants.JSON.htmlInputKey) && !request.has("get")) {
-//				writeBack(e, Constants.StaticText.NetworkDefaultError + "\nPlease provide HTML", sun.net.www.protocol.http.HttpURLConnection.HTTP_BAD_REQUEST);
-//				return; 
-//			}
-			
-			
-			
 			/* Determine if the request is valid, assemble request JSON */
 			try {
 				
 				if (!request.has(Constants.JSON.metaDataKey))
 					request.put(Constants.JSON.metaDataKey, new JSONObject());
-				if (request.has("get_url")) {
-					request.put(Constants.JSON.htmlInputKey, get(request.getString("get_url")).replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B"));
+				if (request.has("html_url")) {
+					request.put(Constants.JSON.htmlInputKey, get(request.getString("html_url")).replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B"));
 				}
 				if (isPOST && !isForwardingToIndexing && !isForwardingLinks) 
 					throw new Exception("POST request must include at least one forwarding address.");	
@@ -244,6 +237,7 @@ public class SimpleHttpServer {
 		public static String get(String surl) {
 			StringBuffer response = new StringBuffer();
 			HttpURLConnection connection = null;
+			BufferedReader in = null;
 			
 			try {
 				
@@ -253,23 +247,22 @@ public class SimpleHttpServer {
 				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36");
 				System.out.println("\nSending 'GET' request to URL : " + surl);
 			    System.out.println("Response Code : " + connection.getResponseCode());
-			    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			    in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			    String inputLine;
 			    
 
 			    while ((inputLine = in.readLine()) != null) {
 			        response.append(inputLine);
 			    }
-			    in.close();
-//				BufferedReader in = new BufferedReader(
-//				        new InputStreamReader(connection.getInputStream()),
-//			  			
-//				        String inputLine;
-//				        while ((inputLine = in.readLine()) != null)
-//				            content += inputLine;
-//				        in.close();
-			}catch ( Exception ex ) {
-			    ex.printStackTrace();
+			
+
+			}catch (Exception ex) {
+			    //ex.printStackTrace();
+			}
+			try {
+				in.close();
+			} catch(IOException ex) {
+				ex.printStackTrace();
 			}
 			System.out.println(response.toString());
 			return response.toString();
