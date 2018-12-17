@@ -1,21 +1,20 @@
 package TextTransformation;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+
+
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Scanner;
-
-//import javax.servlet.*;
-//import javax.servlet.http.*;
+import java.sql.Timestamp;
 
 import org.json.JSONObject;
 
@@ -93,6 +92,7 @@ public class SimpleHttpServer {
 	static class InfoHandler implements HttpHandler {
 		public void handle(HttpExchange e) throws IOException {
 			String response = Constants.StaticText.NetworkWelcomeMessage;
+					
 			e.sendResponseHeaders(200, response.length());
 			OutputStream os = e.getResponseBody();
 			os.write(response.getBytes());
@@ -123,11 +123,11 @@ public class SimpleHttpServer {
 			
 			/* ForwardHandler only handles GETs and POSTs; redirect to Info page*/
 			if (!isPOST && !isGET) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\nPlease use POST or GET.", HttpURLConnection.HTTP_BAD_REQUEST);
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\n" + (new Timestamp(System.currentTimeMillis())).toString() +"\nPlease use POST or GET.", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			} else if (stringQuery == null) {
-				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "Please provide some HTML to parse ('html') or a webpage to parse ('html_url').", HttpURLConnection.HTTP_BAD_REQUEST);
+				writeBack(e, Constants.StaticText.NetworkWelcomeMessageHTML + "\n" + "\nPlease provide some HTML to parse ('html') or a webpage to parse ('html_url').", HttpURLConnection.HTTP_BAD_REQUEST);
 				e.close();
 				return;
 			}
@@ -148,9 +148,15 @@ public class SimpleHttpServer {
 				
 				if (!request.has(Constants.JSON.metaDataKey))
 					request.put(Constants.JSON.metaDataKey, new JSONObject());
+				
 				if (request.has("html_url")) {
-					request.put(Constants.JSON.htmlInputKey, get(request.getString("html_url")).replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B"));
+					String rawHTML = get(request.getString("html_url")).replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B");
+					if (rawHTML.length() < 10) {
+						throw new Exception("Cannot GET the specified webpage (" + request.getString("html_url") + ")");
+					}
+					request.put(Constants.JSON.htmlInputKey, rawHTML);
 				}
+				
 				if (isPOST && !isForwardingToIndexing && !isForwardingLinks) 
 					throw new Exception("POST request must include at least one forwarding address.");	
 			} catch (Exception err) {

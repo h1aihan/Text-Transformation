@@ -25,7 +25,7 @@ public final class Constants {
 		public static final String infoAddress = rootAddress + "info";
 		public static final String transformAndReturn = rootAddress + "transformed";
 		public static final String transformAndForward = rootAddress;
-		public static final InetSocketAddress socketAddress = new InetSocketAddress(8080);
+		public static final InetSocketAddress socketAddress = new InetSocketAddress(80);
 	}
 	public static class StaticText {
 		public static String NetworkDefaultError = "Uh oh! Something went wrong...";
@@ -35,7 +35,13 @@ public final class Constants {
 		public static String NetworkWelcomeMessage = "Hello! Welcome to the Indigo-O Text Transformer!";
 		public static String NetworkDefaultTitle = "transform text with indigo-O";
 		public static String NetworkWelcomeMessageHTML = "<HTML><HEAD><TITLE>" + Constants.StaticText.NetworkDefaultTitle + "</TITLE></HEAD>" +
-														 "<BODY>" + Constants.StaticText.NetworkWelcomeMessage + "</BODY></HTML>";
+														 "<BODY><h1>" + Constants.StaticText.NetworkWelcomeMessage + "</h1><h3>Parse...</h3><ul>"
+														 		+ "<li><a href=http://127.0.0.1?html_url=https://www.nytimes.com>the NY Times front page</a></li>"
+														 		+ "<li><a href=http://127.0.0.1?html_url=https://www.www.org>the W3's homepage</a></li>"
+														 		+ "<li><a href=http://127.0.0.1?html_url=https://www.rpi.edu>RPI's homepage</a></li>" 
+														 		+ "<li><a href=http://127.0.0.1?html_url=https://www.apple.com>Apple's homepage</a></li>"
+														 		+ "<li><a href=http://127.0.0.1?html_url=http://www.cs.rpi.edu/~goldsd/index.php>Professor Goldschmidt's homepage</a>" 
+														 		+ "</ul></BODY></HTML>";
 	}
 	
 	public static class Parsing {
